@@ -5,12 +5,13 @@
   "author": "jake.albaugh@gmail.com",
   "license": "MIT",
   "scripts": {
-    "setup": "node app/setup.js",
-    "populate": "node app/populate.js"
+    "setup": "node app/scripts/setup.js",
+    "populate": "node app/scripts/populate.js"
   },
   "dependencies": {
     "colors": "^1.3.2",
     "disconnect": "^1.2.1",
+    "express": "^4.16.4",
     "pg": "^7.5.0"
   },
   "devDependencies": {
