@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Discogs Aggregator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"
+  />
+</head>
+
+<body>
+  <div class="container">
+    <section class="section">
+      <div id="app">
+        <div class="field has-addons">
+          <div class="control">
+            <a class="button is-info is-small" @click="onArtistChange()">Artist</a>
+          </div>
+          <div class="control">
+            <span class="select is-small is-fullwidth">
+              <select v-model="artist" @change="onArtistChange()">
+                <option v-for="artist in artists" :value="artist.id">{{ artist.name }}</option>
+              </select>
+            </span>
+          </div>
+        </div>
+
+        <div class="field has-addons">
+          <div class="control">
+            <a class="button is-info is-small" @click="onLabelChange()">Label</a>
+          </div>
+          <div class="control">
+            <span class="select is-small is-fullwidth">
+              <select v-model="label" @change="onLabelChange()">
+                <option v-for="label in labels" :value="label.id">{{ label.name }}</option>
+              </select>
+            </span>
+          </div>
+        </div>
+
+        <div class="field has-addons">
+          <div class="control">
+            <a class="button is-info is-small" @click="onCollectionChange()">Collection</a>
+          </div>
+          <div class="control">
+            <span class="select is-small is-fullwidth">
+              <select v-model="collection" @change="onCollectionChange()">
+                <option v-for="collection in collections" :value="collection.id">
+                  {{ collection.id }} ({{ collection.size }})
+                </option>
+              </select>
+            </span>
+          </div>
+        </div>
+
+        <hr>
+
+        <h2 class="title is-5">{{ message }}</h2>
+
+        <table class="table is-narrow is-fullwidth is-striped">
+          <thead>
+            <th>
+              <a @click="sortByCollectionCount">
+                <span v-if="sort === 'collection-asc'">#&nbsp;▾</span>
+                <span v-else-if="sort === 'collection-desc'">#&nbsp;▴</span>
+                <span v-else>#</span>
+              </a>
+            </th>
+            <th>
+              <a @click="sortByReleaseTitle">
+                <span v-if="sort === 'release-asc'">Release&nbsp;▾</span>
+                <span v-else-if="sort === 'release-desc'">Release&nbsp;▴</span>
+                <span v-else>Release</span>
+              </a>
+            </th>
+            <th>Year</th>
+            <th>Artists</th>
+            <th>Labels</th>
+            <th>Formats</th>
+          </thead>
+          <tbody>
+            <tr v-for="release in releases">
+              <td>
+                <small>{{ release.collection_count }}</small>
+              </td>
+              <td>
+                <small>{{ release.title }}</small>
+              </td>
+              <td>
+                <small>{{ release.year }}</small>
+              </td>
+              <td>
+                <span v-for="artist, i in sortedByName(release.artists)">
+                  <span v-if="i !== 0">&nbsp;&bull;</span>
+                  <small>
+                    <a @click="onArtistChange(artist.id)">{{ artist.name }}</a>
+                  </small>
+                </span>
+              </td>
+              <td>
+                <span v-for="label, i in sortedByName(release.labels)">
+                  <span v-if="i !== 0">&nbsp;&bull;</span>
+                  <small>
+                    <a @click="onLabelChange(label.id)">{{ label.name }}</a>
+                  </small>
+                </span>
+              </td>
+              <td>
+                <span v-for="format, i in release.formats">
+                  <small class="tag is-small" :class="{ 'is-dark': !['Vinyl', 'CD'].includes(format), 'is-info': format.name === 'Vinyl', 'is-primary': format.name === 'CD' }">
+                    <span v-if="format.description">{{ format.name }}, {{ format.description }}</span>
+                    <span v-else>{{ format.name }}</span>
+                    <span v-if="format.quantity && format.quantity > 1">&nbsp;&times;{{ format.quantity }}</span>
+                  </small>&nbsp;
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src=" https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js "></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js "></script>
+  <script src="app.js "></script>
+</body>
+
+</html>
