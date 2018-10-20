@@ -1,0 +1,19 @@
+{
+  "name": "discogs_aggregator",
+  "version": "1.0.0",
+  "main": "app/populate.js",
+  "author": "jake.albaugh@gmail.com",
+  "license": "MIT",
+  "scripts": {
+    "setup": "node app/setup.js",
+    "populate": "node app/populate.js"
+  },
+  "dependencies": {
+    "colors": "^1.3.2",
+    "disconnect": "^1.2.1",
+    "pg": "^7.5.0"
+  },
+  "devDependencies": {
+    "prettier": "^1.14.2"
+  }
+}
