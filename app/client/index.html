@@ -8,6 +8,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"
   />
+  <style>
+    .focus-tag {
+      cursor: pointer;
+    }
+
+    .focus-tag .on-focus {
+      display: none;
+    }
+
+    .focus-tag:focus {
+      outline: none;
+    }
+
+    .focus-tag:focus .on-focus {
+      display: block;
+    }
+
+    .focus-tag:focus .no-focus {
+      display: none;
+    }
+  </style>
 </head>
 
 <body>
@@ -63,22 +84,29 @@
           <thead>
             <th>
               <a @click="sortByCollectionCount">
-                <span v-if="sort === 'collection-asc'">#&nbsp;▾</span>
-                <span v-else-if="sort === 'collection-desc'">#&nbsp;▴</span>
+                <span v-if="sort === 'collection-asc'">#&nbsp;▴</span>
+                <span v-else-if="sort === 'collection-desc'">#&nbsp;▾</span>
                 <span v-else>#</span>
               </a>
             </th>
             <th>
               <a @click="sortByReleaseTitle">
-                <span v-if="sort === 'release-asc'">Release&nbsp;▾</span>
-                <span v-else-if="sort === 'release-desc'">Release&nbsp;▴</span>
+                <span v-if="sort === 'release-asc'">Release&nbsp;▴</span>
+                <span v-else-if="sort === 'release-desc'">Release&nbsp;▾</span>
                 <span v-else>Release</span>
               </a>
             </th>
             <th>Year</th>
             <th>Artists</th>
             <th>Labels</th>
-            <th>Formats</th>
+            <th>
+              Formats
+              <span class="tag is-info">Vinyl</span>
+              <span class="tag is-primary">CD</span>
+              <span class="tag is-warning">Box</span>
+              <span class="tag is-danger">All</span>
+              <span class="tag is-dark">Other</span>
+            </th>
           </thead>
           <tbody>
             <tr v-for="release in releases">
@@ -95,7 +123,7 @@
                 <span v-for="artist, i in sortedByName(release.artists)">
                   <span v-if="i !== 0">&nbsp;&bull;</span>
                   <small>
-                    <a @click="onArtistChange(artist.id)">{{ artist.name }}</a>
+                    <a @click="onArtistChange(artist.id)">{{ artist.name.replace(/ /g, '&nbsp;') }}</a>
                   </small>
                 </span>
               </td>
@@ -103,16 +131,19 @@
                 <span v-for="label, i in sortedByName(release.labels)">
                   <span v-if="i !== 0">&nbsp;&bull;</span>
                   <small>
-                    <a @click="onLabelChange(label.id)">{{ label.name }}</a>
+                    <a @click="onLabelChange(label.id)">{{ label.name.replace(/ /g, '&nbsp;') }}</a>
                   </small>
                 </span>
               </td>
               <td>
                 <span v-for="format, i in release.formats">
-                  <small class="tag is-small" :class="{ 'is-dark': !['Vinyl', 'CD'].includes(format), 'is-info': format.name === 'Vinyl', 'is-primary': format.name === 'CD' }">
-                    <span v-if="format.description">{{ format.name }}, {{ format.description }}</span>
-                    <span v-else>{{ format.name }}</span>
-                    <span v-if="format.quantity && format.quantity > 1">&nbsp;&times;{{ format.quantity }}</span>
+                  <small>
+                    <button class="focus-tag tag is-small" :class="{ 'is-dark': !['Vinyl', 'CD', 'Box Set', 'All Media'].includes(format.name), 'is-info': format.name === 'Vinyl', 'is-primary': format.name === 'CD', 'is-warning': format.name === 'Box Set', 'is-danger': format.name === 'All Media' }">
+                      <span class="on-focus">
+                        {{ format.name }}, {{ format.description }} &times;{{ format.quantity }}
+                      </span>
+                      <span class="no-focus">&nbsp;</span>
+                    </button>
                   </small>&nbsp;
                 </span>
               </td>
