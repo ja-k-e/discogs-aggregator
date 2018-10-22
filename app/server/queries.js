@@ -40,7 +40,7 @@ const queries = {
       AND release_id != ${releaseId}
       GROUP BY release_id, er.formats
       ORDER BY count(distinct collection_id) DESC
-      LIMIT 100;
+      LIMIT 50;
   `,
   getArtistReleases: artistId => `
     SELECT er.*

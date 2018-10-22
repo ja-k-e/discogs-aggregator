@@ -17,8 +17,9 @@
         <div v-if="release">
           <p class="title is-3">{{ release.title }}</p>
           <p class="subtitle is-5">
-            {{ release.artists.map(a => a.name).join(', ')}} ({{ release.year }})
-            <br> {{ release.formats.map(a => `${a.description} (${a.quantity})`).join(', ')}}
+            {{ release.artists.map(a => a.name).join(' &bull; ') }} ({{ release.year }})
+            <br> {{ release.formats.map(a => `${a.description} (${a.quantity})`).join(' &bull; ') }}
+            <br> {{ release.labels.map(l => l.name).join(' &bull; ') }}
             <br>
             <em>In {{ release.collection_count }} Collections</em>
           </p>
@@ -43,17 +44,17 @@
             </th>
           </thead>
           <tbody>
-            <tr v-for="release in releases">
+            <tr v-for="r in releases">
               <td>
-                <small>{{ release.collection_count }}</small>
+                <small>{{ r.collection_count }} ({{ Math.round(r.collection_count / release.collection_count * 100) }}%)</small>
               </td>
               <td>
                 <small>
-                  <a :href="`/release?releaseId=${ release.release_id }`" target="blank">{{ release.title }} ({{ release.year }})</a>
+                  <a :href="`/release?releaseId=${ r.release_id }`" target="blank">{{ r.title }} ({{ r.year }})</a>
                 </small>
               </td>
               <td>
-                <span v-for="artist, i in release.artists">
+                <span v-for="artist, i in r.artists">
                   <span v-if="i !== 0">&nbsp;&bull;</span>
                   <small>
                     {{ artist.name.replace(/ /g, '&nbsp;') }}
@@ -61,7 +62,7 @@
                 </span>
               </td>
               <td>
-                <span v-for="label, i in release.labels">
+                <span v-for="label, i in r.labels">
                   <span v-if="i !== 0">&nbsp;&bull;</span>
                   <small>
                     {{ label.name.replace(/ /g, '&nbsp;') }}
