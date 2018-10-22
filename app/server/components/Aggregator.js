@@ -13,7 +13,12 @@ class Aggregator {
     console.log(`🤞  Processing ${this.users} User(s).`.green.bold);
     return new Promise((resolve, reject) => {
       this.processUser()
-        .then(resolve)
+        .then(() => {
+          this.database
+            .refreshMaterializedViews()
+            .then(() => resolve())
+            .catch(reject);
+        })
         .catch(reject);
     });
   }

@@ -8,27 +8,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"
   />
-  <style>
-    .focus-tag {
-      cursor: pointer;
-    }
-
-    .focus-tag .on-focus {
-      display: none;
-    }
-
-    .focus-tag:focus {
-      outline: none;
-    }
-
-    .focus-tag:focus .on-focus {
-      display: block;
-    }
-
-    .focus-tag:focus .no-focus {
-      display: none;
-    }
-  </style>
 </head>
 
 <body>
@@ -37,36 +16,33 @@
       <div id="app">
         <div class="field has-addons">
           <div class="control">
-            <a class="button is-info is-small" @click="onArtistChange()">Artist</a>
-          </div>
-          <div class="control">
-            <span class="select is-small is-fullwidth">
+            <span class="select">
               <select v-model="artist" @change="onArtistChange()">
                 <option v-for="artist in artists" :value="artist.id">{{ artist.name }}</option>
               </select>
             </span>
           </div>
+          <div class="control">
+            <a class="button is-info" @click="onArtistChange()">Artist</a>
+          </div>
         </div>
 
         <div class="field has-addons">
           <div class="control">
-            <a class="button is-info is-small" @click="onLabelChange()">Label</a>
-          </div>
-          <div class="control">
-            <span class="select is-small is-fullwidth">
+            <span class="select">
               <select v-model="label" @change="onLabelChange()">
                 <option v-for="label in labels" :value="label.id">{{ label.name }}</option>
               </select>
             </span>
           </div>
+          <div class="control">
+            <a class="button is-info" @click="onLabelChange()">Label</a>
+          </div>
         </div>
 
         <div class="field has-addons">
           <div class="control">
-            <a class="button is-info is-small" @click="onCollectionChange()">Collection</a>
-          </div>
-          <div class="control">
-            <span class="select is-small is-fullwidth">
+            <span class="select">
               <select v-model="collection" @change="onCollectionChange()">
                 <option v-for="collection in collections" :value="collection.id">
                   {{ collection.id }} ({{ collection.size }})
@@ -74,20 +50,23 @@
               </select>
             </span>
           </div>
+          <div class="control">
+            <a class="button is-info" @click="onCollectionChange()">Collection</a>
+          </div>
         </div>
-
-        <hr>
 
         <h2 class="title is-5">{{ message }}</h2>
 
         <table class="table is-narrow is-fullwidth is-striped">
           <thead>
             <th>
-              <a @click="sortByCollectionCount">
-                <span v-if="sort === 'collection-asc'">#&nbsp;▴</span>
-                <span v-else-if="sort === 'collection-desc'">#&nbsp;▾</span>
-                <span v-else>#</span>
-              </a>
+              <small>
+                <a @click="sortByCollectionCount">
+                  <span v-if="sort === 'collection-asc'">#&nbsp;▴</span>
+                  <span v-else-if="sort === 'collection-desc'">#&nbsp;▾</span>
+                  <span v-else>#</span>
+                </a>
+              </small>
             </th>
             <th>
               <a @click="sortByReleaseTitle">
@@ -99,14 +78,6 @@
             <th>Year</th>
             <th>Artists</th>
             <th>Labels</th>
-            <th>
-              Formats
-              <span class="tag is-info">Vinyl</span>
-              <span class="tag is-primary">CD</span>
-              <span class="tag is-warning">Box</span>
-              <span class="tag is-danger">All</span>
-              <span class="tag is-dark">Other</span>
-            </th>
           </thead>
           <tbody>
             <tr v-for="release in releases">
@@ -114,7 +85,9 @@
                 <small>{{ release.collection_count }}</small>
               </td>
               <td>
-                <small>{{ release.title }}</small>
+                <small>
+                  <a :href="`/release?releaseId=${ release.id }`" target="blank">{{ release.title }}</a>
+                </small>
               </td>
               <td>
                 <small>{{ release.year }}</small>
@@ -133,18 +106,6 @@
                   <small>
                     <a @click="onLabelChange(label.id)">{{ label.name.replace(/ /g, '&nbsp;') }}</a>
                   </small>
-                </span>
-              </td>
-              <td>
-                <span v-for="format, i in release.formats">
-                  <small>
-                    <button class="focus-tag tag is-small" :class="{ 'is-dark': !['Vinyl', 'CD', 'Box Set', 'All Media'].includes(format.name), 'is-info': format.name === 'Vinyl', 'is-primary': format.name === 'CD', 'is-warning': format.name === 'Box Set', 'is-danger': format.name === 'All Media' }">
-                      <span class="on-focus">
-                        {{ format.name }}, {{ format.description }} &times;{{ format.quantity }}
-                      </span>
-                      <span class="no-focus">&nbsp;</span>
-                    </button>
-                  </small>&nbsp;
                 </span>
               </td>
             </tr>

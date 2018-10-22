@@ -47,3 +47,22 @@ CREATE TABLE label_releases (
   release_id INTEGER NOT NULL
 );
 CREATE UNIQUE INDEX label_releases_idx ON public.label_releases USING btree (label_id, release_id);
+
+CREATE MATERIALIZED VIEW expanded_releases AS
+SELECT
+    r.id,
+    r.title,
+    r.year::INT,
+    r.formats,
+    array_to_json(array_agg(distinct a)) AS artists,
+    array_to_json(array_agg(distinct l)) AS labels,
+    count(distinct collections.collection_id)::INT AS collection_count,
+    array_agg(distinct collections.collection_id) AS collections
+  FROM releases r
+ INNER JOIN artist_releases ar ON r.id = ar.release_id
+ INNER JOIN artists a ON a.id = ar.artist_id
+ INNER JOIN label_releases lr ON r.id = lr.release_id
+ INNER JOIN labels l ON l.id = lr.label_id
+  LEFT JOIN collection_releases collections ON collections.release_id = r.id
+ GROUP BY r.id, r.title, r.year, r.formats
+ ORDER BY r.id;

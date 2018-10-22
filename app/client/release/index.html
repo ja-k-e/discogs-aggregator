@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Metrics - Discogs Aggregator</title>
+  <link rel="stylesheet" type="text/css" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"
+  />
+</head>
+
+<body>
+  <div class="container">
+    <section class="section">
+      <div id="app">
+        <div v-if="release">
+          <p class="title is-3">{{ release.title }}</p>
+          <p class="subtitle is-5">
+            {{ release.artists.map(a => a.name).join(', ')}} ({{ release.year }})
+            <br> {{ release.formats.map(a => `${a.description} (${a.quantity})`).join(', ')}}
+            <br>
+            <em>In {{ release.collection_count }} Collections</em>
+          </p>
+          <p>
+            <h2 class="title is-4">Most-collected with "{{ release.title }}"</h2>
+          </p>
+        </div>
+
+        <table class="table is-narrow is-fullwidth is-striped">
+          <thead>
+            <th>
+              <small>Shared</small>
+            </th>
+            <th>
+              <small>Release</small>
+            </th>
+            <th>
+              <small>Artists</small>
+            </th>
+            <th>
+              <small>Labels</small>
+            </th>
+          </thead>
+          <tbody>
+            <tr v-for="release in releases">
+              <td>
+                <small>{{ release.collection_count }}</small>
+              </td>
+              <td>
+                <small>
+                  <a :href="`/release?releaseId=${ release.release_id }`" target="blank">{{ release.title }} ({{ release.year }})</a>
+                </small>
+              </td>
+              <td>
+                <span v-for="artist, i in release.artists">
+                  <span v-if="i !== 0">&nbsp;&bull;</span>
+                  <small>
+                    {{ artist.name.replace(/ /g, '&nbsp;') }}
+                  </small>
+                </span>
+              </td>
+              <td>
+                <span v-for="label, i in release.labels">
+                  <span v-if="i !== 0">&nbsp;&bull;</span>
+                  <small>
+                    {{ label.name.replace(/ /g, '&nbsp;') }}
+                  </small>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src=" https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js "></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js "></script>
+  <script>
+    var app = new Vue({
+      el: "#app",
+      data() {
+        return {
+          release: null,
+          releases: null
+        };
+      },
+      methods: {
+      },
+      mounted() {
+        let id = window.location.search.match(/releaseId=(\d+)/);
+        id = id ? id[1] : 11256980;
+        axios.get("/api/release", { params: { releaseId: id } }).then(res => {
+          this.release = res.data.release;
+          this.releases = res.data.releases;
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -53,13 +53,15 @@ var app = new Vue({
       let params = { artistId: this.artist };
       let artist = this.artists.filter(({ id, name }) => id === this.artist)[0];
       this.message = `Releases for Artist "${artist.name}"`;
-      axios.get("/artist", { params }).then(res => (this.releases = res.data));
+      axios
+        .get("/api/artist-releases", { params })
+        .then(res => (this.releases = res.data));
     },
     onCollectionChange() {
       let params = { collectionId: this.collection };
       this.message = `Releases for Collection "${this.collection}"`;
       axios
-        .get("/collection", { params })
+        .get("/api/collection-releases", { params })
         .then(res => (this.releases = res.data));
     },
     onLabelChange(id = null) {
@@ -67,11 +69,13 @@ var app = new Vue({
       let label = this.labels.filter(({ id, name }) => id === this.label)[0];
       this.message = `Releases for Label "${label.name}"`;
       let params = { labelId: this.label };
-      axios.get("/label", { params }).then(res => (this.releases = res.data));
+      axios
+        .get("/api/label-releases", { params })
+        .then(res => (this.releases = res.data));
     }
   },
   mounted() {
-    axios.get("/all", { params: {} }).then(res => {
+    axios.get("/api/all", { params: {} }).then(res => {
       this.collections = res.data.collections;
       this.artists = res.data.artists;
       this.labels = res.data.labels;
@@ -80,9 +84,9 @@ var app = new Vue({
       this.artist = this.artists[0].id;
       this.message = `Releases for Collection "${this.collection}"`;
       let params = { collectionId: this.collections[0].id };
-      axios
-        .get("/collection", { params })
-        .then(res => (this.releases = res.data));
+      axios.get("/api/collection-releases", { params }).then(res => {
+        this.releases = res.data;
+      });
     });
   }
 });

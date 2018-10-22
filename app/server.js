@@ -9,32 +9,43 @@ app.listen(3000, function() {
 });
 
 app.use(express.static(`${__dirname}/client`));
-app.get("/all", function(req, res) {
+
+app.get("/api/all", (req, res) => {
   db.execute(queries.getAllData())
-    .then(data => {
-      res.send(data.rows[0]);
-    })
+    .then(data => res.send(data.rows[0]))
     .catch(e => errorHandler(e, res));
 });
-app.get("/collection", function(req, res) {
+app.get("/api/artist-occurrence", (req, res) => {
+  db.execute(queries.getArtists())
+    .then(data => res.send(data.rows))
+    .catch(e => errorHandler(e, res));
+});
+app.get("/api/collection-releases", (req, res) => {
   db.execute(queries.getCollectionReleases(req.query.collectionId))
-    .then(data => {
-      res.send(data.rows);
-    })
+    .then(data => res.send(data.rows))
     .catch(e => errorHandler(e, res));
 });
-app.get("/label", function(req, res) {
+app.get("/api/release", (req, res) => {
+  db.execute(
+    `SELECT * FROM expanded_releases WHERE id = ${req.query.releaseId} LIMIT 1;`
+  ).then(data => {
+    let response = { release: data.rows[0], releases: null };
+    db.execute(queries.getReleaseGraph(req.query.releaseId))
+      .then(data => {
+        response.releases = data.rows;
+        res.send(response);
+      })
+      .catch(e => errorHandler(e, res));
+  });
+});
+app.get("/api/label-releases", (req, res) => {
   db.execute(queries.getLabelReleases(req.query.labelId))
-    .then(data => {
-      res.send(data.rows);
-    })
+    .then(data => res.send(data.rows))
     .catch(e => errorHandler(e, res));
 });
-app.get("/artist", function(req, res) {
+app.get("/api/artist-releases", (req, res) => {
   db.execute(queries.getArtistReleases(req.query.artistId))
-    .then(data => {
-      res.send(data.rows);
-    })
+    .then(data => res.send(data.rows))
     .catch(e => errorHandler(e, res));
 });
 

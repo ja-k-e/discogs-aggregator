@@ -19,6 +19,10 @@ class Database {
     });
   }
 
+  refreshMaterializedViews() {
+    return this.execute(`REFRESH MATERIALIZED VIEW expanded_releases;`);
+  }
+
   upsertCollection(data) {
     return new Promise((resolve, reject) => {
       var sql;
