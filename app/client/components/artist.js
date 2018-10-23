@@ -3,6 +3,11 @@ Vue.component("artist", {
     artist: Object,
     artists: Array
   },
+  data() {
+    return {
+      activeTab: "releases"
+    };
+  },
   computed: {
     sortedReleases() {
       return this.artist.releases.sort((a, b) => {
@@ -48,49 +53,57 @@ Vue.component("artist", {
       <br>
       Collections: <strong>{{ artist.collection_count }}</strong>
     </p>
-    <br>
 
-    <h2 class="title is-5">Releases ({{ artist.release_count }})</h2>
+    <div class="tabs">
+      <ul>
+        <li :class="{ 'is-active': activeTab == 'releases' }">
+          <a @click="activeTab = 'releases'">Releases ({{ artist.release_count }})</a>
+        </li>
+        <li :class="{ 'is-active': activeTab == 'common' }">
+          <a @click="activeTab = 'common'">Artists Often Collected with "{{ artist.name }}"</a>
+        </li>
+      </ul>
+    </div>
 
-    <table class="table is-narrow is-fullwidth is-striped">
-      <thead>
-        <th><small>#</small></th>
-        <th><small>Release</small></th>
-        <th><small>Formats</small></th>
-        <th><small>Labels</small></th>
-        <th><small>Collab</small></th>
-      </thead>
-      <tbody>
-        <tr v-for="r in sortedReleases">
-          <td><small>{{ r.collection_count }}</small></td>
-          <td><small v-html="formatRelease(r)"></small></td>
-          <td><small>{{ r.formats.map(formatFormat).join('&bull;') }}</small></td>
-          <td><small v-html="formatLabels(r.labels)"></small></td>
-          <td><small v-html="formatArtists(r.artists)"></small></td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-if="activeTab == 'releases'">
+      <table class="table is-narrow is-fullwidth is-striped">
+        <thead>
+          <th><small>#</small></th>
+          <th><small>Release</small></th>
+          <th><small>Formats</small></th>
+          <th><small>Labels</small></th>
+          <th><small>Collab</small></th>
+        </thead>
+        <tbody>
+          <tr v-for="r in sortedReleases">
+            <td><small>{{ r.collection_count }}</small></td>
+            <td><small v-html="formatRelease(r)"></small></td>
+            <td><small>{{ r.formats.map(formatFormat).join('&bull;') }}</small></td>
+            <td><small v-html="formatLabels(r.labels)"></small></td>
+            <td><small v-html="formatArtists(r.artists)"></small></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-    <br>
-
-    <h2 class="title is-5">Artists often-collected with "{{ artist.name }}"</h2>
-
-    <table class="table is-narrow is-fullwidth is-striped">
-      <thead>
-        <th><small>Shared Collections</small></th>
-        <th><small>Artist</small></th>
-      </thead>
-      <tbody>
-        <tr v-for="a in artists">
-          <td>
-            <small>{{ a.collection_count }} ({{ Math.round(a.collection_count / artist.collection_count * 100) }}%)</small>
-          </td>
-          <td>
-            <small><a :href="artistLink(a.artist_id)" target="blank">{{ a.name }}</a></small>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-if="activeTab == 'common'">
+      <table class="table is-narrow is-fullwidth is-striped">
+        <thead>
+          <th><small>Shared Collections</small></th>
+          <th><small>Artist</small></th>
+        </thead>
+        <tbody>
+          <tr v-for="a in artists">
+            <td>
+              <small>{{ a.collection_count }} ({{ Math.round(a.collection_count / artist.collection_count * 100) }}%)</small>
+            </td>
+            <td>
+              <small><a :href="artistLink(a.artist_id)" target="blank">{{ a.name }}</a></small>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
   `
 });
