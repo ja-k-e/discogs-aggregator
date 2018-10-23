@@ -3,7 +3,8 @@ Vue.component("browser", {
     collections: Array,
     artists: Array,
     labels: Array,
-    releases: Array
+    releases: Array,
+    index: Array
   },
   data() {
     return {
@@ -11,12 +12,40 @@ Vue.component("browser", {
       artist: this.artists[0].id,
       label: this.labels[0].id,
       sort: "release-asc",
-      message: `Releases for Collection "${this.collections[0].id}"`
+      message: `Releases for Collection "${this.collections[0].id}"`,
+      phrase: null,
+      searchResults: []
     };
   },
   methods: {
+    search() {
+      if (this.phrase) {
+        const options = {
+          shouldSort: true,
+          threshold: 0.1,
+          location: 0,
+          distance: 100,
+          maxPatternLength: 32,
+          minMatchCharLength: 2,
+          keys: ["name"]
+        };
+        const fuse = new Fuse(this.index, options);
+        const result = fuse.search(this.phrase);
+        this.updateResults(result);
+      } else this.updateResults([]);
+    },
+    artistLink(artistId) {
+      return `/artist/${artistId}`;
+    },
     releaseLink(releaseId) {
       return `/release/${releaseId}`;
+    },
+    loadResult({ id, type, name }) {
+      if (type === "artist") this.onArtistChange(parseInt(id));
+      else if (type === "label") this.onLabelChange(parseInt(id));
+      else if (type === "collection") this.onCollectionChange(id);
+      this.phrase = name;
+      this.updateResults([]);
     },
     sortedByName(items) {
       return items;
@@ -25,7 +54,7 @@ Vue.component("browser", {
     },
     sortByCollectionCount() {
       let type =
-        this.sort === "collection-asc" ? "collection-desc" : "collection-asc";
+        this.sort === "collection-desc" ? "collection-asc" : "collection-desc";
       this.sort = type;
       this.releases = this.releases.sort((a, b) => {
         if (parseInt(a.collection_count) > parseInt(b.collection_count))
@@ -55,13 +84,14 @@ Vue.component("browser", {
     onArtistChange(id = null) {
       if (id) this.artist = id;
       let params = { artistId: this.artist };
-      let artist = this.artists.filter(({ id, name }) => id === this.artist)[0];
+      let artist = this.artists.filter(({ id }) => id === this.artist)[0];
       this.message = `Releases for Artist "${artist.name}"`;
       axios
         .get("/api/artist-releases", { params })
         .then(res => this.updateReleases(res.data));
     },
-    onCollectionChange() {
+    onCollectionChange(id = null) {
+      if (id) this.collection = id;
       let params = { collectionId: this.collection };
       this.message = `Releases for Collection "${this.collection}"`;
       axios
@@ -70,7 +100,7 @@ Vue.component("browser", {
     },
     onLabelChange(id = null) {
       if (id) this.label = id;
-      let label = this.labels.filter(({ id, name }) => id === this.label)[0];
+      let label = this.labels.filter(({ id }) => id === this.label)[0];
       this.message = `Releases for Label "${label.name}"`;
       let params = { labelId: this.label };
       axios
@@ -80,51 +110,36 @@ Vue.component("browser", {
     updateReleases(releases) {
       this.releases.splice(0, this.releases.length);
       this.releases.push(...releases);
+    },
+    updateResults(results) {
+      this.searchResults.splice(0, this.searchResults.length);
+      results = results.splice(0, 15);
+      this.searchResults.push(...results);
     }
   },
   template: `
   <div>
-    <div class="field has-addons">
-      <div class="control">
-        <span class="select">
-          <select v-model="artist" @change="onArtistChange()">
-            <option v-for="artist in artists" :value="artist.id">{{ artist.name }}</option>
-          </select>
-        </span>
+    <h2 class="title is-5">Search for a User, Artist, or Label</h2>
+
+    <div class="search-component">
+      <div class="field">
+        <div class="control">
+          <input type="search" v-model="phrase" @input="search()" @focus="search()" class="input" />
+        </div>
       </div>
-      <div class="control">
-        <a class="button is-info" @click="onArtistChange()">Artist</a>
+      <div class="results">
+        <a v-for="result in searchResults" @click="loadResult(result)"
+          :class="{
+            'has-text-primary': result.type === 'artist',
+            'has-text-warning': result.type === 'collection',
+            'has-text-danger': result.type === 'label',
+          }">
+          {{ result.name }} <span>{{ result.type }}</span>
+        </a>
       </div>
     </div>
 
-    <div class="field has-addons">
-      <div class="control">
-        <span class="select">
-          <select v-model="label" @change="onLabelChange()">
-            <option v-for="label in labels" :value="label.id">{{ label.name }}</option>
-          </select>
-        </span>
-      </div>
-      <div class="control">
-        <a class="button is-info" @click="onLabelChange()">Label</a>
-      </div>
-    </div>
-
-    <div class="field has-addons">
-      <div class="control">
-        <span class="select">
-          <select v-model="collection" @change="onCollectionChange()">
-            <option v-for="collection in collections" :value="collection.id">
-              {{ collection.id }} ({{ collection.size }})
-            </option>
-          </select>
-        </span>
-      </div>
-      <div class="control">
-        <a class="button is-info" @click="onCollectionChange()">Collection</a>
-      </div>
-    </div>
-
+    <br>
     <h2 class="title is-5">{{ message }}</h2>
 
     <table class="table is-narrow is-fullwidth is-striped">
@@ -157,7 +172,7 @@ Vue.component("browser", {
           <td>
             <span v-for="artist, i in sortedByName(release.artists)">
               <span v-if="i !== 0">&nbsp;&bull;</span>
-              <small><a @click="onArtistChange(artist.id)">{{ artist.name.replace(/ /g, '&nbsp;') }}</a></small>
+              <small><a :href="artistLink(artist.id)" target="blank">{{ artist.name.replace(/ /g, '&nbsp;') }} ↗</a></small>
             </span>
           </td>
           <td>

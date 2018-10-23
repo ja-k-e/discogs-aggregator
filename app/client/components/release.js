@@ -24,7 +24,7 @@ Vue.component("release", {
     </p>
     <br>
 
-    <h2 class="title is-4">Most-collected with "{{ release.title }}"</h2>
+    <h2 class="title is-5">Most-collected with "{{ release.title }}"</h2>
 
     <table class="table is-narrow is-fullwidth is-striped">
       <thead>

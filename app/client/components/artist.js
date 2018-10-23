@@ -30,19 +30,17 @@ Vue.component("artist", {
   <div>
     <p class="title is-3">{{ artist.name }}</p>
     <p class="subtitle is-5">
-      Releases: <strong>{{ artist.release_count }}</strong>
-      <br>
       Collected: <strong>{{ artist.collected_count }}</strong>
       <br>
       Collections: <strong>{{ artist.collection_count }}</strong>
     </p>
     <br>
-    <h2 class="title is-4">Releases</h2>
+    <h2 class="title is-5">Releases ({{ artist.release_count }})</h2>
 
     <p v-html="formattedReleases(this.sortedReleases)"></p>
     <br>
 
-    <h2 class="title is-4">Most-collected with "{{ artist.name }}"</h2>
+    <h2 class="title is-5">Most-collected with "{{ artist.name }}"</h2>
 
     <table class="table is-narrow is-fullwidth is-striped">
       <thead>

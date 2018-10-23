@@ -8,6 +8,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"
   />
+  <style>
+    div.search-component {
+      position: relative;
+    }
+
+    div.search-component .results {
+      position: absolute;
+      top: calc(100% + 4px);
+      z-index: 9;
+      background: white;
+      border: 1px solid #ddd;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      border-radius: 4px;
+    }
+
+    div.search-component .results:empty {
+      box-shadow: none;
+      border: none;
+    }
+
+    div.search-component .results>a {
+      box-sizing: border-box;
+      padding: 0.5rem 1rem;
+      display: flex;
+      font-size: 0.9rem;
+      width: 100%;
+      font-weight: bold;
+    }
+
+    div.search-component .results>a span {
+      margin-left: auto;
+    }
+
+    div.search-component .results>a+a {
+      border-top: 1px solid #ddd;
+    }
+  </style>
 </head>
 
 <body>
@@ -16,7 +54,7 @@
       <div id="app">
         <div v-if="payload"></div>
         <browser v-if="currentView == 'browser'" :collections="payload.collections" :artists="payload.artists" :releases="payload.releases"
-          :labels="payload.labels"></browser>
+          :labels="payload.labels" :index="payload.index"></browser>
         <release v-else-if="currentView == 'release'" :release="payload.release" :releases="payload.releases"></release>
         <artist v-else-if="currentView == 'artist'" :artist="payload.artist" :artists="payload.artists"></artist>
       </div>
@@ -27,6 +65,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js"></script>
 
   <script src="/components/artist.js"></script>
   <script src="/components/browser.js"></script>
