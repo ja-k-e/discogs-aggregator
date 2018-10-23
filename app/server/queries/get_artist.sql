@@ -1,4 +1,5 @@
 SELECT
+    max(a.id) AS id,
     max(a.name) AS name,
     count(distinct cr.collection_id) AS collection_count,
     count(cr.release_id) AS collected_count,

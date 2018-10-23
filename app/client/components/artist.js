@@ -18,12 +18,26 @@ Vue.component("artist", {
     artistLink(artistId) {
       return `/artist/${artistId}`;
     },
-    formattedReleases(releases) {
-      return releases
-        .map(({ id, title, year, collection_count }) => {
-          return `<a href="/release/${id}">${title} (${year}) ${collection_count}</a>`;
-        })
+    formatRelease({ id, title, year }) {
+      return `<a href="/release/${id}">${title} ${
+        year === 0 ? "" : `(${year})`
+      }</a>`;
+    },
+    formatArtists(artists) {
+      return artists
+        .filter(a => a.id !== this.artist.id)
+        .map(a => `<a href="/artist/${a.id}">${a.name}</a>`)
         .join(" &bull; ");
+    },
+    formatLabels(labels) {
+      return labels.map(a => a.name).join(" &bull; ");
+    },
+    formatFormat({ name, quantity, description, text }) {
+      let str = `${name}`;
+      if (text) str += `, ${text}`;
+      if (description) str += `, ${description}`;
+      if (quantity !== 1) str += ` (${quantity})`;
+      return str;
     }
   },
   template: `
@@ -35,16 +49,35 @@ Vue.component("artist", {
       Collections: <strong>{{ artist.collection_count }}</strong>
     </p>
     <br>
+
     <h2 class="title is-5">Releases ({{ artist.release_count }})</h2>
-
-    <p v-html="formattedReleases(this.sortedReleases)"></p>
-    <br>
-
-    <h2 class="title is-5">Most-collected with "{{ artist.name }}"</h2>
 
     <table class="table is-narrow is-fullwidth is-striped">
       <thead>
-        <th><small>Shared</small></th>
+        <th><small>#</small></th>
+        <th><small>Release</small></th>
+        <th><small>Formats</small></th>
+        <th><small>Labels</small></th>
+        <th><small>Collab</small></th>
+      </thead>
+      <tbody>
+        <tr v-for="r in sortedReleases">
+          <td><small>{{ r.collection_count }}</small></td>
+          <td><small v-html="formatRelease(r)"></small></td>
+          <td><small>{{ r.formats.map(formatFormat).join('&bull;') }}</small></td>
+          <td><small v-html="formatLabels(r.labels)"></small></td>
+          <td><small v-html="formatArtists(r.artists)"></small></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <br>
+
+    <h2 class="title is-5">Artists often-collected with "{{ artist.name }}"</h2>
+
+    <table class="table is-narrow is-fullwidth is-striped">
+      <thead>
+        <th><small>Shared Collections</small></th>
         <th><small>Artist</small></th>
       </thead>
       <tbody>

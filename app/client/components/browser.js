@@ -110,6 +110,7 @@ Vue.component("browser", {
     updateReleases(releases) {
       this.releases.splice(0, this.releases.length);
       this.releases.push(...releases);
+      this.sort = "release-asc";
     },
     updateResults(results) {
       this.searchResults.splice(0, this.searchResults.length);
@@ -141,6 +142,8 @@ Vue.component("browser", {
 
     <br>
     <h2 class="title is-5">{{ message }}</h2>
+    <p class="subtitle is-6">"#" Denotes how many times the release occurs in <em>all</em> Collections.</p>
+
 
     <table class="table is-narrow is-fullwidth is-striped">
       <thead>
@@ -160,19 +163,21 @@ Vue.component("browser", {
             <span v-else>Release</span>
           </a>
         </th>
-        <th>Year</th>
         <th>Artists</th>
         <th>Labels</th>
       </thead>
       <tbody>
         <tr v-for="release in releases">
           <td><small>{{ release.collection_count }}</small></td>
-          <td><small><a :href="releaseLink(release.id)" target="blank">{{ release.title }} ↗</a></small></td>
-          <td><small>{{ release.year }}</small></td>
+          <td><small><a :href="releaseLink(release.id)" target="blank">
+            {{ release.title }}
+            <span v-if="release.year !== 0">({{ release.year }})</span>
+            <sup>↗</sup></a>
+          </small></td>
           <td>
             <span v-for="artist, i in sortedByName(release.artists)">
               <span v-if="i !== 0">&nbsp;&bull;</span>
-              <small><a :href="artistLink(artist.id)" target="blank">{{ artist.name.replace(/ /g, '&nbsp;') }} ↗</a></small>
+              <small><a :href="artistLink(artist.id)" target="blank">{{ artist.name.replace(/ /g, '&nbsp;') }} <sup>↗</sup></a></small>
             </span>
           </td>
           <td>
