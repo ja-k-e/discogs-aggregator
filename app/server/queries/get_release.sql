@@ -1,0 +1,1 @@
+SELECT * FROM expanded_releases WHERE id = {{ RELEASE_ID }} LIMIT 1;

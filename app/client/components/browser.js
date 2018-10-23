@@ -151,31 +151,19 @@ Vue.component("browser", {
       </thead>
       <tbody>
         <tr v-for="release in releases">
-          <td>
-            <small>{{ release.collection_count }}</small>
-          </td>
-          <td>
-            <small>
-              <a :href="releaseLink(release.id)" target="blank">{{ release.title }} ↗</a>
-            </small>
-          </td>
-          <td>
-            <small>{{ release.year }}</small>
-          </td>
+          <td><small>{{ release.collection_count }}</small></td>
+          <td><small><a :href="releaseLink(release.id)" target="blank">{{ release.title }} ↗</a></small></td>
+          <td><small>{{ release.year }}</small></td>
           <td>
             <span v-for="artist, i in sortedByName(release.artists)">
               <span v-if="i !== 0">&nbsp;&bull;</span>
-              <small>
-                <a @click="onArtistChange(artist.id)">{{ artist.name.replace(/ /g, '&nbsp;') }}</a>
-              </small>
+              <small><a @click="onArtistChange(artist.id)">{{ artist.name.replace(/ /g, '&nbsp;') }}</a></small>
             </span>
           </td>
           <td>
             <span v-for="label, i in sortedByName(release.labels)">
               <span v-if="i !== 0">&nbsp;&bull;</span>
-              <small>
-                <a @click="onLabelChange(label.id)">{{ label.name.replace(/ /g, '&nbsp;') }}</a>
-              </small>
+              <small><a @click="onLabelChange(label.id)">{{ label.name.replace(/ /g, '&nbsp;') }}</a></small>
             </span>
           </td>
         </tr>

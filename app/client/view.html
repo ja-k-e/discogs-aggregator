@@ -14,9 +14,11 @@
   <div class="container">
     <section class="section">
       <div id="app">
-        <browser v-if="currentView == 'browser' && payload" :collections="payload.collections" :artists="payload.artists" :releases="payload.releases"
+        <div v-if="payload"></div>
+        <browser v-if="currentView == 'browser'" :collections="payload.collections" :artists="payload.artists" :releases="payload.releases"
           :labels="payload.labels"></browser>
-        <release v-if="currentView == 'release' && payload" :release="payload.release" :releases="payload.releases"></release>
+        <release v-else-if="currentView == 'release'" :release="payload.release" :releases="payload.releases"></release>
+        <artist v-else-if="currentView == 'artist'" :artist="payload.artist" :artists="payload.artists"></artist>
       </div>
     </section>
   </div>
@@ -26,7 +28,9 @@
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
 
+  <script src="/components/artist.js"></script>
   <script src="/components/browser.js"></script>
+  <script src="/components/release-release.js"></script>
   <script src="/components/release.js"></script>
   <script src="/app.js"></script>
 </body>

@@ -66,3 +66,10 @@ SELECT
   LEFT JOIN collection_releases collections ON collections.release_id = r.id
  GROUP BY r.id, r.title, r.year, r.formats
  ORDER BY r.id;
+
+CREATE MATERIALIZED VIEW collection_artists AS
+SELECT
+    cr.collection_id,
+    ar.artist_id
+  FROM collection_releases cr
+  LEFT JOIN artist_releases ar ON ar.release_id = cr.release_id;

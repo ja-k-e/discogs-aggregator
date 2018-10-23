@@ -9,11 +9,6 @@ app.listen(3000, function() {
 app.get("/app.js", function(req, res) {
   res.sendFile(`${__dirname}/client/app.js`);
 });
-app.get("/components/browser.js", function(req, res) {
-  res.sendFile(`${__dirname}/client/components/browser.js`);
-});
-app.get("/components/release.js", function(req, res) {
-  res.sendFile(`${__dirname}/client/components/release.js`);
-});
+app.use("/components", express.static(`${__dirname}/client/components`));
 
 new Routes(app);

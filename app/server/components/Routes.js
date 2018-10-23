@@ -13,6 +13,7 @@ class Routes {
   initialize() {
     this.initializeRoot();
     this.initializeRelease();
+    this.initializeArtist();
     this.app.get("/api/collection-releases", (req, res) => {
       db.execute(queries.getCollectionReleases(req.query.collectionId))
         .then(data => res.send(data.rows))
@@ -52,16 +53,29 @@ class Routes {
   initializeRelease() {
     let data = { type: "release" };
     this.app.get("/release/:releaseId", (req, res) => {
-      db.execute(
-        `SELECT * FROM expanded_releases WHERE id = ${
-          req.params.releaseId
-        } LIMIT 1;`
-      )
+      db.execute(queries.getRelease(req.params.releaseId))
         .then(response => {
           data.payload = { release: response.rows[0] };
           db.execute(queries.getReleaseGraph(req.params.releaseId))
             .then(response => {
               data.payload.releases = response.rows;
+              res.send(this.injectData(data));
+            })
+            .catch(e => this.errorHandler(e, res));
+        })
+        .catch(e => this.errorHandler(e, res));
+    });
+  }
+
+  initializeArtist() {
+    let data = { type: "artist" };
+    this.app.get("/artist/:artistId", (req, res) => {
+      db.execute(queries.getArtist(req.params.artistId))
+        .then(response => {
+          data.payload = { artist: response.rows[0] };
+          db.execute(queries.getArtistGraph(req.params.artistId))
+            .then(response => {
+              data.payload.artists = response.rows;
               res.send(this.injectData(data));
             })
             .catch(e => this.errorHandler(e, res));
