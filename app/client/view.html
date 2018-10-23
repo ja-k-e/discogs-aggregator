@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Discogs Aggregator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"
+  />
+</head>
+
+<body>
+  <div class="container">
+    <section class="section">
+      <div id="app">
+        <browser v-if="currentView == 'browser' && payload" :collections="payload.collections" :artists="payload.artists" :releases="payload.releases"
+          :labels="payload.labels"></browser>
+        <release v-if="currentView == 'release' && payload" :release="payload.release" :releases="payload.releases"></release>
+      </div>
+    </section>
+  </div>
+
+  <input type="hidden" id="payload" value="" />
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+
+  <script src="/components/browser.js"></script>
+  <script src="/components/release.js"></script>
+  <script src="/app.js"></script>
+</body>
+
+</html>
