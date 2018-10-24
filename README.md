@@ -1,6 +1,6 @@
 # Discogs Aggregator
 
-Aggregating Discogs data to determine which artists are often collected with other artists and which releases are often collected with other releases.
+Aggregating Discogs data to determine which Artists are often collected with other Artists and which Releases are often collected with other Releases.
 
 ## Setup
 
