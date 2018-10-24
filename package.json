@@ -1,5 +1,5 @@
 {
-  "name": "discogs_aggregator",
+  "name": "discogs-aggregator",
   "version": "1.0.0",
   "main": "app/populate.js",
   "author": "jake.albaugh@gmail.com",
