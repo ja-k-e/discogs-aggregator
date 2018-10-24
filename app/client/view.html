@@ -66,6 +66,7 @@
           :labels="payload.labels" :index="payload.index"></browser>
         <release v-else-if="currentView == 'release'" :release="payload.release" :releases="payload.releases"></release>
         <artist v-else-if="currentView == 'artist'" :artist="payload.artist" :artists="payload.artists"></artist>
+        <server v-else-if="currentView == 'server'" :usernames="payload.usernames"></server>
       </div>
     </section>
   </div>
@@ -80,6 +81,7 @@
   <script src="/components/browser.js"></script>
   <script src="/components/release-release.js"></script>
   <script src="/components/release.js"></script>
+  <script src="/components/server.js"></script>
   <script src="/app.js"></script>
 </body>
 

@@ -1,5 +1,6 @@
 const Database = require("./Database");
 const db = new Database();
+const cp = require("child_process");
 const fs = require("fs");
 const {
   getAllData,
@@ -28,18 +29,20 @@ class Routes {
   }
 
   async initializeViews() {
-    await this.initializeRoot();
-    await this.initializeArtist();
-    await this.initializeRelease();
+    await this.initializeViewRoot();
+    await this.initializeViewServer();
+    await this.initializeViewArtist();
+    await this.initializeViewRelease();
   }
 
   async initializeApi() {
     await this.initializeApiArtistReleases();
     await this.initializeApiCollectionReleases();
     await this.initializeApiLabelReleases();
+    await this.initializeApiPopulate();
   }
 
-  async initializeRoot() {
+  async initializeViewRoot() {
     const callback = async (req, res) => {
       const data = { type: "browser" };
       const allData = await db.execute(getAllData());
@@ -52,7 +55,17 @@ class Routes {
     this.app.get("/", am(callback));
   }
 
-  async initializeArtist() {
+  async initializeViewServer() {
+    const callback = async (req, res) => {
+      const data = { type: "server" };
+      const allData = { usernames: ["WUT"] };
+      data.payload = allData;
+      res.send(this.injectData(data));
+    };
+    this.app.get("/server", am(callback));
+  }
+
+  async initializeViewArtist() {
     const callback = async (req, res) => {
       const data = { type: "artist" };
       const artist = await db.execute(getArtist(req.params.artistId));
@@ -64,7 +77,7 @@ class Routes {
     this.app.get("/artist/:artistId", am(callback));
   }
 
-  async initializeRelease() {
+  async initializeViewRelease() {
     const callback = async (req, res) => {
       const data = { type: "release" };
       const release = await db.execute(getRelease(req.params.releaseId));
@@ -100,6 +113,34 @@ class Routes {
       res.send(releases.rows);
     };
     this.app.get("/api/label-releases", am(callback));
+  }
+
+  async initializeApiPopulate() {
+    const callback = (req, res) => {
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-control": "no-cache"
+      });
+
+      res.write("TBD");
+      res.end();
+      // const spw = cp.spawn(`yarn ${__dirname}/../populate.js`);
+      // var str = "";
+      // spw.stdout.on("data", function(data) {
+      //   str += data.toString();
+      //   // Flush out line by line.
+      //   let lines = str.split("\n");
+      //   for (let i in lines) {
+      //     if (i == lines.length - 1) str = lines[i];
+      //     // Note: The double-newline is *required*
+      //     else res.write(lines[i] + "\n\n");
+      //   }
+      // });
+      // // spw.on("close", code => res.end(str));
+      // spw.on("error", data => res.end("stderr: " + data));
+      // spw.stderr.on("data", data => res.end("stderr: " + data));
+    };
+    this.app.get("/api/populate", callback);
   }
 
   injectData(data) {
