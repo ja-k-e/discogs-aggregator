@@ -7,8 +7,8 @@ Aggregating Discogs data to determine which Artists are often collected with oth
 - `yarn install`
 - `createdb discogs_collections` we are using postgres.
 - `touch secrets.json` then update it with your db connection settings and (optional) Discogs API token.
-  - Providing a Discogs API `userToken` speeds up rate limiting to 60 per minute from 25.
-  - `{ consumerKey: '...', consumerSecret: '...' }` will also work if you have them, but a `userToken` is more than enough.
+  - Providing a Discogs API `userToken` ups rate limiting from 25 per minute to 60, practically preventing you from hitting a rate limit.
+  - `discogs: { consumerKey: '...', consumerSecret: '...' }` will also work if you have them, but a `userToken` is more than enough.
 
 ```json
 {
