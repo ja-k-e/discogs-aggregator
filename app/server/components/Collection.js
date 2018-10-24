@@ -1,4 +1,4 @@
-const colors = require("colors");
+const _ = require("colors");
 const Database = require("./Database");
 const Discogs = require("disconnect").Client;
 const fs = require("fs");

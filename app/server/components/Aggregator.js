@@ -1,4 +1,4 @@
-const colors = require("colors");
+const _ = require("colors");
 const Collection = require("./Collection");
 const Database = require("./Database");
 

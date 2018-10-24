@@ -23,24 +23,20 @@ class Routes {
   }
 
   async initialize() {
+    await this.initializeViews();
+    await this.initializeApi();
+  }
+
+  async initializeViews() {
     await this.initializeRoot();
-    await this.initializeRelease();
     await this.initializeArtist();
-    this.app.get("/api/collection-releases", (req, res) => {
-      db.execute(getCollectionReleases(req.query.collectionId))
-        .then(data => res.send(data.rows))
-        .catch(e => this.errorHandler(e, res));
-    });
-    this.app.get("/api/label-releases", (req, res) => {
-      db.execute(getLabelReleases(req.query.labelId))
-        .then(data => res.send(data.rows))
-        .catch(e => this.errorHandler(e, res));
-    });
-    this.app.get("/api/artist-releases", (req, res) => {
-      db.execute(getArtistReleases(req.query.artistId))
-        .then(data => res.send(data.rows))
-        .catch(e => this.errorHandler(e, res));
-    });
+    await this.initializeRelease();
+  }
+
+  async initializeApi() {
+    await this.initializeApiArtistReleases();
+    await this.initializeApiCollectionReleases();
+    await this.initializeApiLabelReleases();
   }
 
   async initializeRoot() {
@@ -56,18 +52,6 @@ class Routes {
     this.app.get("/", am(callback));
   }
 
-  async initializeRelease() {
-    const callback = async (req, res) => {
-      const data = { type: "release" };
-      const release = await db.execute(getRelease(req.params.releaseId));
-      data.payload = { release: release.rows[0] };
-      const graph = await db.execute(getReleaseGraph(req.params.releaseId));
-      data.payload.releases = graph.rows;
-      res.send(this.injectData(data));
-    };
-    this.app.get("/release/:releaseId", callback);
-  }
-
   async initializeArtist() {
     const callback = async (req, res) => {
       const data = { type: "artist" };
@@ -77,7 +61,45 @@ class Routes {
       data.payload.artists = graph.rows;
       res.send(this.injectData(data));
     };
-    this.app.get("/artist/:artistId", callback);
+    this.app.get("/artist/:artistId", am(callback));
+  }
+
+  async initializeRelease() {
+    const callback = async (req, res) => {
+      const data = { type: "release" };
+      const release = await db.execute(getRelease(req.params.releaseId));
+      data.payload = { release: release.rows[0] };
+      const graph = await db.execute(getReleaseGraph(req.params.releaseId));
+      data.payload.releases = graph.rows;
+      res.send(this.injectData(data));
+    };
+    this.app.get("/release/:releaseId", am(callback));
+  }
+
+  async initializeApiArtistReleases() {
+    const callback = async (req, res) => {
+      const releases = await db.execute(getArtistReleases(req.query.artistId));
+      res.send(releases.rows);
+    };
+    this.app.get("/api/artist-releases", am(callback));
+  }
+
+  async initializeApiCollectionReleases() {
+    const callback = async (req, res) => {
+      const releases = await db.execute(
+        getCollectionReleases(req.query.collectionId)
+      );
+      res.send(releases.rows);
+    };
+    this.app.get("/api/collection-releases", am(callback));
+  }
+
+  async initializeApiLabelReleases() {
+    const callback = async (req, res) => {
+      const releases = await db.execute(getLabelReleases(req.query.labelId));
+      res.send(releases.rows);
+    };
+    this.app.get("/api/label-releases", am(callback));
   }
 
   injectData(data) {

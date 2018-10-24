@@ -1,3 +1,4 @@
+const _ = require("colors");
 const express = require("express");
 const app = express();
 const Routes = require("./server/components/Routes");
@@ -11,4 +12,7 @@ app.get("/app.js", function(req, res) {
 });
 app.use("/components", express.static(`${__dirname}/client/components`));
 
-new Routes(app);
+const initialize = async () => await new Routes(app);
+initialize().then(() => {
+  console.log("Initialized Server!".blue);
+});
