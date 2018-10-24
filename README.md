@@ -1,5 +1,7 @@
 # Discogs Aggregator
 
+Aggregating Discogs data to determine which artists are often collected with other artists and which releases are often collected with other releases.
+
 ## Setup
 
 - `yarn install`
@@ -77,3 +79,11 @@ Which would yield something along the lines of:
 | John Coltrane | 88          |
 | Bob Dylan     | 82          |
 
+## Client
+
+After populating your database, you can start the client with `yarn serve`.
+Then visit [localhost:3000](http://localhost:3000). From here you can search for Collections, Artists, or Labels.
+
+Clicking an Artist name will take you to the Artist page which contains all Releases in the database for that Artist as well as data for which Artists are most often collected with that Artist.
+
+Clicking a Release name will take you to the Release page which contains Release metadata as well as data for which Releases are most often collected with that Release.
