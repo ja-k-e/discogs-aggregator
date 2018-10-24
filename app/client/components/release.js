@@ -17,11 +17,17 @@ Vue.component("release", {
       activeTab: "meta"
     };
   },
-  template: `
+  template: releaseTemplate()
+});
+
+function releaseTemplate() {
+  return /*html*/ `
   <div>
     <p class="title is-3">{{ release.title }}</p>
     <p class="subtitle is-5">
       <span v-html="formattedArtists"></span> ({{ release.year }})
+      <br>
+      Collections: <strong>{{ release.collection_count }}</strong>
     </p>
 
     <div class="tabs">
@@ -30,15 +36,13 @@ Vue.component("release", {
           <a @click="activeTab = 'meta'">Metadata</a>
         </li>
         <li :class="{ 'is-active': activeTab == 'common' }">
-          <a @click="activeTab = 'common'">Releases Often Collected with "{{ release.title }}"</a>
+          <a @click="activeTab = 'common'">Similar Releases ({{ releases.length }})</a>
         </li>
       </ul>
     </div>
 
     <div v-if="activeTab == 'meta'">
       <p class="subtitle is-5">
-        Collections: <strong>{{ release.collection_count }}</strong>
-        <br>
         Labels: {{ release.labels.map(l => l.name).join(', ') }}
       </p>
 
@@ -81,5 +85,5 @@ Vue.component("release", {
       </table>
     </div>
   </div>
-  `
-});
+  `;
+}

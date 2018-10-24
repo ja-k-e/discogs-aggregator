@@ -118,9 +118,13 @@ Vue.component("browser", {
       this.searchResults.push(...results);
     }
   },
-  template: `
+  template: browserTemplate()
+});
+
+function browserTemplate() {
+  return /* html */ `
   <div>
-    <h2 class="title is-5">Search for a User, Artist, or Label</h2>
+    <h2 class="title is-5">Search for a Collection, Artist, or Label</h2>
 
     <div class="search-component">
       <div class="field">
@@ -165,6 +169,7 @@ Vue.component("browser", {
         </th>
         <th>Artists</th>
         <th>Labels</th>
+        <th>Formats</th>
       </thead>
       <tbody>
         <tr v-for="release in releases">
@@ -186,9 +191,15 @@ Vue.component("browser", {
               <small><a @click="onLabelChange(label.id)">{{ label.name.replace(/ /g, '&nbsp;') }}</a></small>
             </span>
           </td>
+          <td>
+            <span v-for="format, i in release.formats">
+              <span v-if="i !== 0">&nbsp;&bull;</span>
+              <small>{{ format.name }} ({{ format.quantity > 1 ? format.quantity : '' }})</a></small>
+            </span>
+          </td>
         </tr>
       </tbody>
     </table>
   </div>
-  `
-});
+  `;
+}

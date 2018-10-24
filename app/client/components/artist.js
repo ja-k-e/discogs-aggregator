@@ -45,7 +45,11 @@ Vue.component("artist", {
       return str;
     }
   },
-  template: `
+  template: artistTemplate()
+});
+
+function artistTemplate() {
+  return /* html */ `
   <div>
     <p class="title is-3">{{ artist.name }}</p>
     <p class="subtitle is-5">
@@ -60,7 +64,7 @@ Vue.component("artist", {
           <a @click="activeTab = 'releases'">Releases ({{ artist.release_count }})</a>
         </li>
         <li :class="{ 'is-active': activeTab == 'common' }">
-          <a @click="activeTab = 'common'">Artists Often Collected with "{{ artist.name }}"</a>
+          <a @click="activeTab = 'common'">Similar Artists ({{ artists.length }})</a>
         </li>
       </ul>
     </div>
@@ -105,5 +109,5 @@ Vue.component("artist", {
       </table>
     </div>
   </div>
-  `
-});
+  `;
+}
