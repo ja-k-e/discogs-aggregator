@@ -1,8 +1,20 @@
 const Database = require("./Database");
 const db = new Database();
-const queries = require("../queries");
 const fs = require("fs");
-const cheerio = require("cheerio");
+const {
+  getAllData,
+  getArtist,
+  getArtistGraph,
+  getArtistReleases,
+  getCollectionReleases,
+  getLabelReleases,
+  getRelease,
+  getReleaseGraph
+} = require("../queries");
+
+const am = fn => (req, res) => {
+  Promise.resolve(fn(req, res)).catch(console.error);
+};
 
 class Routes {
   constructor(app) {
@@ -10,78 +22,62 @@ class Routes {
     this.initialize();
   }
 
-  initialize() {
-    this.initializeRoot();
-    this.initializeRelease();
-    this.initializeArtist();
+  async initialize() {
+    await this.initializeRoot();
+    await this.initializeRelease();
+    await this.initializeArtist();
     this.app.get("/api/collection-releases", (req, res) => {
-      db.execute(queries.getCollectionReleases(req.query.collectionId))
+      db.execute(getCollectionReleases(req.query.collectionId))
         .then(data => res.send(data.rows))
         .catch(e => this.errorHandler(e, res));
     });
     this.app.get("/api/label-releases", (req, res) => {
-      db.execute(queries.getLabelReleases(req.query.labelId))
+      db.execute(getLabelReleases(req.query.labelId))
         .then(data => res.send(data.rows))
         .catch(e => this.errorHandler(e, res));
     });
     this.app.get("/api/artist-releases", (req, res) => {
-      db.execute(queries.getArtistReleases(req.query.artistId))
+      db.execute(getArtistReleases(req.query.artistId))
         .then(data => res.send(data.rows))
         .catch(e => this.errorHandler(e, res));
     });
   }
 
-  initializeRoot() {
-    this.app.get("/", (req, res) => {
-      let data = { type: "browser" };
-      db.execute(queries.getAllData())
-        .then(response => {
-          data.payload = response.rows[0];
-          db.execute(
-            queries.getCollectionReleases(data.payload.collections[0].id)
-          )
-            .then(response => {
-              data.payload.releases = response.rows;
-              res.send(this.injectData(data));
-            })
-            .catch(e => console.error(e, res));
-        })
-        .catch(e => console.error(e, res));
-    });
+  async initializeRoot() {
+    const callback = async (req, res) => {
+      const data = { type: "browser" };
+      const allData = await db.execute(getAllData());
+      data.payload = allData.rows[0];
+      const releaseQ = getCollectionReleases(data.payload.collections[0].id);
+      const releases = await db.execute(releaseQ);
+      data.payload.releases = releases.rows;
+      res.send(this.injectData(data));
+    };
+    this.app.get("/", am(callback));
   }
 
-  initializeRelease() {
-    let data = { type: "release" };
-    this.app.get("/release/:releaseId", (req, res) => {
-      db.execute(queries.getRelease(req.params.releaseId))
-        .then(response => {
-          data.payload = { release: response.rows[0] };
-          db.execute(queries.getReleaseGraph(req.params.releaseId))
-            .then(response => {
-              data.payload.releases = response.rows;
-              res.send(this.injectData(data));
-            })
-            .catch(e => this.errorHandler(e, res));
-        })
-        .catch(e => this.errorHandler(e, res));
-    });
+  async initializeRelease() {
+    const callback = async (req, res) => {
+      const data = { type: "release" };
+      const release = await db.execute(getRelease(req.params.releaseId));
+      data.payload = { release: release.rows[0] };
+      const graph = await db.execute(getReleaseGraph(req.params.releaseId));
+      data.payload.releases = graph.rows;
+      res.send(this.injectData(data));
+    };
+    this.app.get("/release/:releaseId", callback);
   }
 
-  initializeArtist() {
-    let data = { type: "artist" };
-    this.app.get("/artist/:artistId", (req, res) => {
-      db.execute(queries.getArtist(req.params.artistId))
-        .then(response => {
-          data.payload = { artist: response.rows[0] };
-          db.execute(queries.getArtistGraph(req.params.artistId))
-            .then(response => {
-              data.payload.artists = response.rows;
-              res.send(this.injectData(data));
-            })
-            .catch(e => this.errorHandler(e, res));
-        })
-        .catch(e => this.errorHandler(e, res));
-    });
+  async initializeArtist() {
+    const callback = async (req, res) => {
+      const data = { type: "artist" };
+      const artist = await db.execute(getArtist(req.params.artistId));
+      data.payload = { artist: artist.rows[0] };
+      const graph = await db.execute(getArtistGraph(req.params.artistId));
+      data.payload.artists = graph.rows;
+      res.send(this.injectData(data));
+    };
+    this.app.get("/artist/:artistId", callback);
   }
 
   injectData(data) {
