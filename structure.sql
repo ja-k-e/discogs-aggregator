@@ -54,10 +54,10 @@ SELECT
     r.title,
     r.year::INT,
     r.formats,
-    array_to_json(array_agg(distinct a)) AS artists,
-    array_to_json(array_agg(distinct l)) AS labels,
-    count(distinct collections.collection_id)::INT AS collection_count,
-    array_agg(distinct collections.collection_id) AS collections
+    array_to_json(array_agg(DISTINCT a)) AS artists,
+    array_to_json(array_agg(DISTINCT l)) AS labels,
+    count(DISTINCT collections.collection_id)::INT AS collection_count,
+    array_agg(DISTINCT collections.collection_id) AS collections
   FROM releases r
  INNER JOIN artist_releases ar ON r.id = ar.release_id
  INNER JOIN artists a ON a.id = ar.artist_id
@@ -69,7 +69,7 @@ SELECT
 
 CREATE MATERIALIZED VIEW collection_artists AS
 SELECT
-    cr.collection_id,
+    DISTINCT cr.collection_id,
     ar.artist_id
   FROM collection_releases cr
   LEFT JOIN artist_releases ar ON ar.release_id = cr.release_id;

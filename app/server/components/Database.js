@@ -20,7 +20,10 @@ class Database {
   }
 
   refreshMaterializedViews() {
-    return this.execute(`REFRESH MATERIALIZED VIEW expanded_releases;`);
+    return this.execute(`
+      REFRESH MATERIALIZED VIEW expanded_releases;
+      REFRESH MATERIALIZED VIEW collection_artists;
+    `);
   }
 
   upsertCollection(data) {
