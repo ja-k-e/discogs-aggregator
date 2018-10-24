@@ -12,7 +12,7 @@ Vue.component("browser", {
       artist: this.artists[0].id,
       label: this.labels[0].id,
       sort: "release-asc",
-      message: `Releases for Collection "${this.collections[0].id}"`,
+      message: `Releases for Collection “${this.collections[0].id}”`,
       phrase: null,
       searchResults: []
     };
@@ -85,7 +85,7 @@ Vue.component("browser", {
       if (id) this.artist = id;
       let params = { artistId: this.artist };
       let artist = this.artists.filter(({ id }) => id === this.artist)[0];
-      this.message = `Releases for Artist "${artist.name}"`;
+      this.message = `Releases for Artist “${artist.name}”`;
       axios
         .get("/api/artist-releases", { params })
         .then(res => this.updateReleases(res.data));
@@ -93,7 +93,7 @@ Vue.component("browser", {
     onCollectionChange(id = null) {
       if (id) this.collection = id;
       let params = { collectionId: this.collection };
-      this.message = `Releases for Collection "${this.collection}"`;
+      this.message = `Releases for Collection “${this.collection}”`;
       axios
         .get("/api/collection-releases", { params })
         .then(res => this.updateReleases(res.data));
@@ -101,7 +101,7 @@ Vue.component("browser", {
     onLabelChange(id = null) {
       if (id) this.label = id;
       let label = this.labels.filter(({ id }) => id === this.label)[0];
-      this.message = `Releases for Label "${label.name}"`;
+      this.message = `Releases for Label “${label.name}”`;
       let params = { labelId: this.label };
       axios
         .get("/api/label-releases", { params })
@@ -146,7 +146,7 @@ function browserTemplate() {
 
     <br>
     <h2 class="title is-5">{{ message }}</h2>
-    <p class="subtitle is-6">"#" Denotes how many times the release occurs in <em>all</em> Collections.</p>
+    <p class="subtitle is-6">“#” Denotes how many times the release occurs in <em>all</em> Collections.</p>
 
 
     <table class="table is-narrow is-fullwidth is-striped">
@@ -194,7 +194,7 @@ function browserTemplate() {
           <td>
             <span v-for="format, i in release.formats">
               <span v-if="i !== 0">&nbsp;&bull;</span>
-              <small>{{ format.name }} ({{ format.quantity > 1 ? format.quantity : '' }})</a></small>
+              <small>{{ format.name }} {{ format.quantity > 1 ? '('+format.quantity+')' : '' }}</a></small>
             </span>
           </td>
         </tr>
