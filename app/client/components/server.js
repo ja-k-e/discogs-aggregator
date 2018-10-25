@@ -16,19 +16,35 @@ Vue.component("server", {
   methods: {
     populate() {
       this.populating = true;
-      var evtSource = new EventSource("/api/populate");
+      const source = new EventSource("/api/populate");
 
-      evtSource.onmessage = e => this.messages.push(e.data);
+      source.onmessage = ({ data }) => {
+        let { payload, type } = JSON.parse(data);
+        let message = sanitizePayload(payload);
+        if (type === "complete") {
+          source.close();
+          this.populating = false;
+          console.log("DONE");
+        } else console.log(payload);
+        this.messages.push(message);
+      };
 
-      evtSource.onerror = e => {
+      source.onerror = endHandler;
+      source.onend = endHandler;
+
+      function sanitizePayload(payload) {
+        if (!payload) return "";
+        let regex = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
+        return payload.replace(regex, "");
+      }
+
+      function endHandler({ data }) {
         this.populating = false;
-        console.error(e);
-      };
-      evtSource.onend = () => {
-        this.populating = false;
-        console.log("EventSource terminated.");
-      };
-      console.log(evtSource);
+        source.close();
+        let { payload, type } = JSON.parse(data);
+        if (type === "complete") console.log("DONE");
+        else console.log("ERROR", payload);
+      }
     }
   },
   template: serverTemplate()
@@ -41,7 +57,9 @@ function serverTemplate() {
     <p><button @click="populate()" class="button is-info" :disabled="populating">Run populate()</button></p>
 
     <div>
-      <p v-for="message in sortedMessages">{{ message }}</p>
+      <pre>
+{{ messages.join('\\n') }}
+      </pre>
     </div>
   </div>
   `;

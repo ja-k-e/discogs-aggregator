@@ -1,6 +1,7 @@
+const Aggregator = require("./Aggregator");
 const Database = require("./Database");
 const db = new Database();
-const cp = require("child_process");
+const sse = require("./sse");
 const fs = require("fs");
 const {
   getAllData,
@@ -20,6 +21,7 @@ const am = fn => (req, res) => {
 class Routes {
   constructor(app) {
     this.app = app;
+    this.app.use(sse);
     this.initialize();
   }
 
@@ -116,31 +118,46 @@ class Routes {
   }
 
   async initializeApiPopulate() {
-    const callback = (req, res) => {
-      res.writeHead(200, {
-        "Content-Type": "text/event-stream",
-        "Cache-control": "no-cache"
-      });
-
-      res.write("TBD");
-      res.end();
-      // const spw = cp.spawn(`yarn ${__dirname}/../populate.js`);
-      // var str = "";
-      // spw.stdout.on("data", function(data) {
-      //   str += data.toString();
-      //   // Flush out line by line.
-      //   let lines = str.split("\n");
-      //   for (let i in lines) {
-      //     if (i == lines.length - 1) str = lines[i];
-      //     // Note: The double-newline is *required*
-      //     else res.write(lines[i] + "\n\n");
-      //   }
-      // });
-      // // spw.on("close", code => res.end(str));
-      // spw.on("error", data => res.end("stderr: " + data));
-      // spw.stderr.on("data", data => res.end("stderr: " + data));
-    };
-    this.app.get("/api/populate", callback);
+    this.app.get("/api/populate", (req, res, next) => {
+      res.sseSetup();
+      const aggregator = new Aggregator(
+        [
+          "_aeb_",
+          "_argonaut_",
+          "_asmith",
+          "_awii_",
+          "_bp_",
+          "_mgp_",
+          "_zameericle_",
+          "-highfidelity-",
+          ".everyone.",
+          ".riot.",
+          "10.K",
+          "12past12",
+          "14Bowie",
+          "1ArmB3n",
+          "1nsubordinate",
+          "247esp",
+          "2DoubleFives",
+          "300mhz",
+          "33third",
+          "3rd-iii",
+          "415masterson89",
+          "4RevGreen",
+          "5ixty5ix",
+          "61beet",
+          "6od",
+          "7000records"
+        ],
+        d => {
+          res.sseSend({ type: "message", payload: d });
+        }
+      );
+      aggregator
+        .run()
+        .then(data => res.sseSend({ type: "complete", payload: "" }))
+        .catch(e => res.sseEnd({ type: "error", payload: e }));
+    });
   }
 
   injectData(data) {

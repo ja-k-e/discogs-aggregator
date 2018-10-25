@@ -7,7 +7,8 @@ const PER_PAGE = 100;
 const PAGE_LIMIT = 10;
 
 class Collection {
-  constructor(username) {
+  constructor(username, messenger) {
+    this.messenger = messenger;
     this.username = username;
     this.api = new Discogs(settings.discogs).user().collection();
     // How long to push the request back in seconds if we hit a rate limit.
@@ -46,7 +47,7 @@ class Collection {
             if (count !== this.collection.size) resolve(this._run());
             else {
               this.data.collection.size = count;
-              console.log(`  ✔ No updates!`.green);
+              this.messenger(`  ✔ No updates!`.green);
               resolve(this.data);
             }
           })
@@ -56,7 +57,7 @@ class Collection {
               message === "You are making requests too quickly.";
             if (rateLimited) {
               // Try again later
-              console.log(
+              this.messenger(
                 `❗ Rate Limited. Pushing Back ${this.pushback}s.`.red
               );
               setTimeout(() => resolve(this.run()), this.pushback * 1000);
@@ -76,7 +77,7 @@ class Collection {
           collection = collection.concat(
             releases.map(this._formatRelease.bind(this))
           );
-          console.log(`  ➡ Page ${page} of ${pagination.pages}`.blue);
+          this.messenger(`  ➡ Page ${page} of ${pagination.pages}`.blue);
           this.data.collection.size = pagination.items;
           if (pagination.pages === page || page >= PAGE_LIMIT) {
             this._processCollection(collection);
@@ -89,7 +90,7 @@ class Collection {
             message === "You are making requests too quickly.";
           if (rateLimited) {
             // Try again later
-            console.log(
+            this.messenger(
               ` ❗ Rate Limited. Pushing Back ${this.pushback}s.`.red
             );
             setTimeout(
