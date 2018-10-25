@@ -16,6 +16,7 @@ Vue.component("server", {
   methods: {
     populate() {
       this.populating = true;
+      this.messages = [];
       const source = new EventSource("/api/populate");
 
       source.onmessage = ({ data }) => {
