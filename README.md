@@ -100,13 +100,11 @@ Which would yield something along the lines of:
 ## Client
 
 After populating your database, you can start the client with `yarn serve`.
-Then visit [localhost:3000](http://localhost:3000).
-
-![Home Page](assets/browser.png?raw=true "Home Page")
-
-From here you can search for Collections, Artists, or Labels.
+Then visit [localhost:3000](http://localhost:3000). From here you can search for Collections, Artists, or Labels.
 
 ![Home Page Search](assets/browser-search.png?raw=true "Home Page Search")
+
+![Home Page](assets/browser.png?raw=true "Home Page")
 
 Clicking a Release name will take you to the Release page which contains Release metadata as well as data for which Releases are most often collected with that Release.
 
