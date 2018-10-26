@@ -100,22 +100,26 @@ Which would yield something along the lines of:
 ## Client
 
 After populating your database, you can start the client with `yarn serve`.
-Then visit [localhost:3000](http://localhost:3000). From here you can search for Collections, Artists, or Labels.
+Then visit [localhost:3000](http://localhost:3000).
 
-![/browser](assets/browser.png?raw=true "Home Page")
+![Home Page](assets/browser.png?raw=true "Home Page")
+
+From here you can search for Collections, Artists, or Labels.
+
+![Home Page Search](assets/browser-search.png?raw=true "Home Page Search")
 
 Clicking a Release name will take you to the Release page which contains Release metadata as well as data for which Releases are most often collected with that Release.
 
-![/release](assets/release.png?raw=true "Release Page")
+![Release Page](assets/release.png?raw=true "Release Page")
 
 Clicking an Artist name will take you to the Artist page which contains all Releases in the database for that Artist as well as data for which Artists are most often collected with that Artist.
 
-![/artist](assets/artist.png?raw=true "Artist Page")
+![Artist Page](assets/artist.png?raw=true "Artist Page")
 
 The server page (`/server`) allows you to add or update Discogs Collections to or in your database via the client. You can queue existing Collections or enter in newline-separated Discogs usernames.
 
-![/server-interface](assets/server-interface.png?raw=true "Server Interface")
+![Server Interface](assets/server-interface.png?raw=true "Server Interface")
 
 Once you've queued the usernames, run the scraper.
 
-![/server-populating](assets/server-populating.png?raw=true "Server Population")
+![Server Population](assets/server-populating.png?raw=true "Server Population")
