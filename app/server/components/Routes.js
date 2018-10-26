@@ -138,7 +138,7 @@ class Routes {
           connections.push(res);
           res.sseSend({ type: "complete", payload: "Complete!" });
         })
-        .catch(e => res.sseEnd({ type: "error", payload: e }));
+        .catch(e => res.sseSend({ type: "error", payload: e.message }));
     });
   }
 

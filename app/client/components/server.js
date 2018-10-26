@@ -26,7 +26,8 @@ Vue.component("server", {
       populating: false,
       messages: [],
       queue: {},
-      dumpRaw: ""
+      dumpRaw: "",
+      error: null
     };
   },
   methods: {
@@ -67,12 +68,20 @@ Vue.component("server", {
         setTimeout(() => {
           let messages = $el.querySelector("#messages");
           messages.scrollTop = messages.scrollHeight;
-        }, 10);
+        }, 50);
         if (type === "complete") {
           console.log("DONE");
           this.populating = false;
           source.close();
+          this.clearQueue();
           window.onbeforeunload = null;
+        } else if (type === "error") {
+          this.populating = false;
+          source.close();
+          this.clearQueue();
+          window.onbeforeunload = null;
+          this.error = payload;
+          console.error(payload);
         } else console.log(payload);
       };
 
@@ -89,9 +98,8 @@ Vue.component("server", {
         this.populating = false;
         source.close();
         window.onbeforeunload = null;
-        let { payload, type } = JSON.parse(data);
-        if (type === "complete") console.log("DONE");
-        else console.log("ERROR", payload);
+        let { payload } = JSON.parse(data);
+        console.log("ERROR", payload);
       }
     }
   },
@@ -104,19 +112,14 @@ function serverTemplate() {
     <h1 class="title is-3">Fetch Data from Discogs.</h1>
     <p class="subtitle is-5">Queue collections from the database or paste in newline-separated queue then run below.</p>
 
-    <p>
-      <button @click="populate()" class="button is-success" :disabled="populating || availableQueue.length === 0">
-        Scrape {{ availableQueue.length }} Discogs Collection(s)
-      </button>
-    </p>
-    <br>
+    <div class="notification is-danger" v-if="error">
+      <button class="delete" @click="error = null"></button>
+      {{ error }}
+    </div>
 
     <div class="columns">
       <div class="column is-one-third">
         <h2 class="title is-5">Queued for Fetching ({{ availableQueue.length }})</h2>
-        <p class="subtitle is-6"><button class="button is-danger is-small" @click="clearQueue()" :disabled="availableQueue.length === 0">
-          <a class="delete is-small"></a>&nbsp; Clear All
-        </button></p>
         <div class="overflow-panel">
           <nav class="panel">
             <label class="panel-block" v-if="availableQueue.length === 0">
@@ -129,14 +132,17 @@ function serverTemplate() {
             </a>
           </nav>
         </div>
+        <br>
+        <button class="button is-fullwidth is-danger" @click="clearQueue()" :disabled="availableQueue.length === 0">
+          <a class="delete is-small"></a>&nbsp; Clear All
+        </button>
+        <br>
+        <button @click="populate()" class="button is-success is-fullwidth" :disabled="populating || availableQueue.length === 0">
+          Import {{ availableQueue.length }} Discogs Collection(s)
+        </button>
       </div>
       <div class="column is-one-third">
         <h2 class="title is-5">Collections in Database ({{ availableCollections.length }})</h2>
-        <p class="subtitle is-6">
-          <button class="button is-info is-small" @click="addAllToQueue()" :disabled="availableCollections.length === 0">
-            <a class="delete plus is-small"></a>&nbsp; Add All
-          </button>
-        </p>
         <div class="overflow-panel">
           <nav class="panel">
             <label class="panel-block" v-if="availableCollections.length === 0">
@@ -149,15 +155,18 @@ function serverTemplate() {
             </a>
           </nav>
         </div>
+        <br>
+        <button class="button is-info is-fullwidth" @click="addAllToQueue()" :disabled="availableCollections.length === 0">
+          <a class="delete plus is-small"></a>&nbsp; Add All
+        </button>
       </div>
       <div class="column is-one-third">
-        <h2 class="title is-5">Paste usernames, new line separated</h2>
-        <p class="subtitle is-6">
-          <button class="button is-info is-small" @click="addDumpToQueue()" :disabled="dump.length === 0">
-            <a class="delete plus is-small"></a>&nbsp; Add
-          </button>
-        </p>
+        <h2 class="title is-5">Paste usernames, new line separated  ({{ dump.length }})</h2>
         <textarea class="textarea" rows="11" v-model="dumpRaw"></textarea>
+        <br>
+        <button class="button is-info is-fullwidth" @click="addDumpToQueue()" :disabled="dump.length === 0">
+          <a class="delete plus is-small"></a>&nbsp; Add
+        </button>
       </div>
     </div>
 
@@ -165,8 +174,9 @@ function serverTemplate() {
       <div class="modal-background"></div>
       <div class="modal-content">
         <div class="box">
-          <h2 class="title is-4">Please don't leave while this is running</h2>
-          <div id="messages" style="max-height: 50vh; overflow-y: auto">
+          <h2 class="title is-4">Don't close while this is running</h2>
+          <h2 class="subtitle is-6">This modal will close when complete.</h2>
+          <div id="messages" style="height: 50vh; overflow-y: auto">
             <p v-for="message in messages">{{ message }}</p>
             <p v-if="messages.length === 0"><em>Waiting...</em></p>
           </div>
