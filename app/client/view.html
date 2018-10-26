@@ -9,6 +9,28 @@
   <link rel="stylesheet" type="text/css" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"
   />
   <style>
+    .overflow-panel {
+      height: 286px;
+      overflow-y: auto;
+      box-shadow: 0px 2px 8px #f0f0f0;
+      border: 1px solid #dbdbdb;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .overflow-panel .panel-block:last-child {
+      border-bottom: none;
+    }
+
+    .overflow-panel .panel-block:first-child {
+      border-top: none;
+    }
+
+    .overflow-panel .panel-block {
+      border-left: none;
+      border-right: none;
+    }
+
     div.search-component {
       position: relative;
     }
@@ -45,6 +67,16 @@
     div.search-component .results>a+a {
       border-top: 1px solid #ddd;
     }
+
+    .delete.plus::after {
+      -webkit-transform: translateX(-50%) translateY(-50%) rotate(0deg);
+      transform: translateX(-50%) translateY(-50%) rotate(0deg);
+    }
+
+    .delete.plus::before {
+      -webkit-transform: translateX(-50%) translateY(-50%) rotate(0deg);
+      transform: translateX(-50%) translateY(-50%) rotate(0deg);
+    }
   </style>
 </head>
 
@@ -56,6 +88,13 @@
           <strong>Discogs Aggregator</strong>
         </a>
       </div>
+      <div class="navbar-menu">
+        <div class="navbar-end">
+          <a class="navbar-item" href="/server">
+            Server
+          </a>
+        </div>
+      </div>
     </div>
   </nav>
   <div class="container">
@@ -66,7 +105,7 @@
           :labels="payload.labels" :index="payload.index"></browser>
         <release v-else-if="currentView == 'release'" :release="payload.release" :releases="payload.releases"></release>
         <artist v-else-if="currentView == 'artist'" :artist="payload.artist" :artists="payload.artists"></artist>
-        <server v-else-if="currentView == 'server'" :usernames="payload.usernames"></server>
+        <server v-else-if="currentView == 'server'" :collections="payload.collections"></server>
       </div>
     </section>
   </div>

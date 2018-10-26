@@ -9,6 +9,7 @@ const queries = {
   getArtist: id => read("get_artist").replace(/{{ ARTIST_ID }}/g, id),
   getArtistGraph: id =>
     read("get_artist_graph").replace(/{{ ARTIST_ID }}/g, id),
+  getCollections: () => read("get_collections"),
   getRelease: id => read("get_release").replace(/{{ RELEASE_ID }}/g, id),
   getReleaseGraph: id =>
     read("get_release_graph").replace(/{{ RELEASE_ID }}/g, id),

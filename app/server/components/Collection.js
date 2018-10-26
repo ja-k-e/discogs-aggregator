@@ -12,7 +12,7 @@ class Collection {
     this.username = username;
     this.api = new Discogs(settings.discogs).user().collection();
     // How long to push the request back in seconds if we hit a rate limit.
-    this.pushback = settings.discogs.userToken ? 15 : 45;
+    this.pushback = settings.discogs.userToken ? 20 : 45;
     this.collection = null; // Populated by #prepare
     this.data = {
       collection: { username, size: 0 },
@@ -77,7 +77,7 @@ class Collection {
           collection = collection.concat(
             releases.map(this._formatRelease.bind(this))
           );
-          this.messenger(`  ➡ Page ${page} of ${pagination.pages}`.blue);
+          this.messenger(`➡ Page ${page} of ${pagination.pages}`.blue);
           this.data.collection.size = pagination.items;
           if (pagination.pages === page || page >= PAGE_LIMIT) {
             this._processCollection(collection);
@@ -91,7 +91,7 @@ class Collection {
           if (rateLimited) {
             // Try again later
             this.messenger(
-              ` ❗ Rate Limited. Pushing Back ${this.pushback}s.`.red
+              `❗ Rate Limited. Pushing Back ${this.pushback}s.`.red
             );
             setTimeout(
               () => resolve(this._run(collection, page)),

@@ -2,6 +2,7 @@ const Aggregator = require("./Aggregator");
 const Database = require("./Database");
 const db = new Database();
 const sse = require("./sse");
+const storedUsernames = require("../../../usernames.json");
 const fs = require("fs");
 const {
   getAllData,
@@ -9,6 +10,7 @@ const {
   getArtistGraph,
   getArtistReleases,
   getCollectionReleases,
+  getCollections,
   getLabelReleases,
   getRelease,
   getReleaseGraph
@@ -60,7 +62,8 @@ class Routes {
   async initializeViewServer() {
     const callback = async (req, res) => {
       const data = { type: "server" };
-      const allData = { usernames: ["WUT"] };
+      const { rows } = await db.execute(getCollections());
+      const allData = { collections: rows };
       data.payload = allData;
       res.send(this.injectData(data));
     };
@@ -117,45 +120,24 @@ class Routes {
     this.app.get("/api/label-releases", am(callback));
   }
 
+  // https://www.terlici.com/2015/12/04/realtime-node-expressjs-with-sse.html
   async initializeApiPopulate() {
     this.app.get("/api/populate", (req, res, next) => {
+      const connections = [];
+      const usernames = req.query.ids
+        .split(",")
+        .map(i => decodeURIComponent(i));
       res.sseSetup();
-      const aggregator = new Aggregator(
-        [
-          "_aeb_",
-          "_argonaut_",
-          "_asmith",
-          "_awii_",
-          "_bp_",
-          "_mgp_",
-          "_zameericle_",
-          "-highfidelity-",
-          ".everyone.",
-          ".riot.",
-          "10.K",
-          "12past12",
-          "14Bowie",
-          "1ArmB3n",
-          "1nsubordinate",
-          "247esp",
-          "2DoubleFives",
-          "300mhz",
-          "33third",
-          "3rd-iii",
-          "415masterson89",
-          "4RevGreen",
-          "5ixty5ix",
-          "61beet",
-          "6od",
-          "7000records"
-        ],
-        d => {
-          res.sseSend({ type: "message", payload: d });
-        }
-      );
+      const aggregator = new Aggregator(usernames, d => {
+        console.log(d);
+        res.sseSend({ type: "message", payload: d });
+      });
       aggregator
         .run()
-        .then(data => res.sseSend({ type: "complete", payload: "" }))
+        .then(data => {
+          connections.push(res);
+          res.sseSend({ type: "complete", payload: "Complete!" });
+        })
         .catch(e => res.sseEnd({ type: "error", payload: e }));
     });
   }
