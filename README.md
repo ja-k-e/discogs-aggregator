@@ -2,6 +2,12 @@
 
 Aggregating Discogs data to determine which Artists are often collected with other Artists and which Releases are often collected with other Releases.
 
+## Requirements
+
+- node js
+- postgres
+- modern browser
+
 ## Setup
 
 - `yarn install`
