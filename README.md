@@ -28,22 +28,27 @@ Aggregating Discogs data to determine which Artists are often collected with oth
 - `yarn setup` to initialize the database. This runs `structure.sql`.
   - Calling this again will delete all of your data. Be careful.
 - Update `usernames.json` to be an array of usernames you want to scrape.
-- `yarn populate` runs the dang thing.
+- `yarn populate` populates the db with the Collections for the usernames in `usernames.json`. You can also do this and more from [the Client](#Client) at `/serve`.
 
 ## DB Structure
 
-This uses four main tables to manage ripped data.
+This uses four primary tables that contain all the data.
 
 - **collections**: username and collection size
 - **releases**: discogs id, title, year, formats (jsonb)
 - **artists**: discogs id, name
 - **labels**: discogs id, name
 
-It has three join tables linking these records together.
+It has three join tables linking releases to different tables.
 
-- **collectionReleases**
-- **artistReleases**
-- **labelReleases**
+- **collection_releases** collection has many releases
+- **artist_releases** artist has and belongs to many releases
+- **label_releases** label has and belongs to many releases
+
+It has two materialized views that aggregate some data.
+
+- **expanded_releases** all release metadata (including artists) in a queryable interface.
+- **collection_artists** a link between a collection and artist.
 
 ## DB Interface
 
