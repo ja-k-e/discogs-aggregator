@@ -1,4 +1,4 @@
-const _ = require("colors");
+require("colors");
 const express = require("express");
 const app = express();
 const Routes = require("./server/components/Routes");

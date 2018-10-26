@@ -1,8 +1,9 @@
+require("colors");
 const Aggregator = require("./Aggregator");
 const Database = require("./Database");
 const db = new Database();
 const sse = require("./sse");
-const storedUsernames = require("../../../usernames.json");
+
 const fs = require("fs");
 const {
   getAllData,
@@ -136,7 +137,7 @@ class Routes {
         .run()
         .then(data => {
           connections.push(res);
-          res.sseSend({ type: "complete", payload: "Complete!" });
+          res.sseSend({ type: "complete", payload: "Complete!".green.bold });
         })
         .catch(e => res.sseSend({ type: "error", payload: e.message }));
     });

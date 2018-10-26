@@ -1,4 +1,4 @@
-const _ = require("colors");
+require("colors");
 const Database = require("./Database");
 const Discogs = require("disconnect").Client;
 const fs = require("fs");
@@ -47,7 +47,7 @@ class Collection {
             if (count !== this.collection.size) resolve(this._run());
             else {
               this.data.collection.size = count;
-              this.messenger(`  ✔ No updates!`.green);
+              this.messenger(`✔ No updates!`.green);
               resolve(this.data);
             }
           })

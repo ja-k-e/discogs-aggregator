@@ -48,6 +48,11 @@ Vue.component("server", {
     removeFromQueue(id) {
       this.$delete(this.queue, id);
     },
+    parseAnsi(ansi) {
+      return ansi
+        .replace(/\[39m|\[49m|\[22m/g, "</span>")
+        .replace(/\[(\d+?)m/g, '<span class="ansi-$1">');
+    },
     populate() {
       this.populating = true;
       this.messages = [];
@@ -62,15 +67,13 @@ Vue.component("server", {
 
       source.onmessage = ({ data }) => {
         let { payload, type } = JSON.parse(data);
-        let message = sanitizePayload(payload);
-        this.messages.push(message);
+        this.messages.push(payload);
         let $el = this.$el;
         setTimeout(() => {
-          let messages = $el.querySelector("#messages");
+          let messages = $el.querySelector("#console-messages");
           messages.scrollTop = messages.scrollHeight;
         }, 50);
         if (type === "complete") {
-          console.log("DONE");
           this.populating = false;
           source.close();
           this.clearQueue();
@@ -87,12 +90,6 @@ Vue.component("server", {
 
       source.onerror = endHandler;
       source.onend = endHandler;
-
-      function sanitizePayload(payload) {
-        if (!payload) return "";
-        let regex = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
-        return payload.replace(regex, "");
-      }
 
       function endHandler({ data }) {
         this.populating = false;
@@ -161,7 +158,7 @@ function serverTemplate() {
         </button>
       </div>
       <div class="column is-one-third">
-        <h2 class="title is-5">Paste usernames, new line separated  ({{ dump.length }})</h2>
+        <h2 class="title is-5">Usernames, new line separated  ({{ dump.length }})</h2>
         <textarea class="textarea" rows="11" v-model="dumpRaw"></textarea>
         <br>
         <button class="button is-info is-fullwidth" @click="addDumpToQueue()" :disabled="dump.length === 0">
@@ -176,9 +173,9 @@ function serverTemplate() {
         <div class="box">
           <h2 class="title is-4">Don't close while this is running</h2>
           <h2 class="subtitle is-6">This modal will close when complete.</h2>
-          <div id="messages" style="height: 50vh; overflow-y: auto">
-            <p v-for="message in messages">{{ message }}</p>
-            <p v-if="messages.length === 0"><em>Waiting...</em></p>
+          <div id="console-messages">
+            <span class="console-message" v-html="parseAnsi(message)" v-for="message in messages"></span>
+            <span class="console-message" v-if="messages.length === 0"><em>Waiting...</em></span>
           </div>
         </div>
       </div>
