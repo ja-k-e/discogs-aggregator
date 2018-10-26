@@ -2,6 +2,13 @@
 
 Aggregating Discogs data to determine which Artists are often collected with other Artists and which Releases are often collected with other Releases.
 
+
+- [Requirements](#requirements)
+- [Setup](#setup)
+- [DB Structure](#db-structure)
+- [DB Interface](#db-interface)
+- [Client](#client)
+
 ## Requirements
 
 - node js
@@ -95,9 +102,20 @@ Which would yield something along the lines of:
 After populating your database, you can start the client with `yarn serve`.
 Then visit [localhost:3000](http://localhost:3000). From here you can search for Collections, Artists, or Labels.
 
+![/browser](assets/browser.png?raw=true "Home Page")
+
 Clicking an Artist name will take you to the Artist page which contains all Releases in the database for that Artist as well as data for which Artists are most often collected with that Artist.
+
+![/artist](assets/artist.png?raw=true "Artist Page")
 
 Clicking a Release name will take you to the Release page which contains Release metadata as well as data for which Releases are most often collected with that Release.
 
-### `/server`
-The server page allows you to add or update Discogs Collections to or in your database via the client. You can queue existing Collections or enter in newline-separated Discogs usernames. Once you've queued the usernames, run the scraper.
+![/release](assets/release.png?raw=true "Release Page")
+
+The server page (`/server`) allows you to add or update Discogs Collections to or in your database via the client. You can queue existing Collections or enter in newline-separated Discogs usernames.
+
+![/server-interface](assets/server-interface.png?raw=true "Server Interface")
+
+Once you've queued the usernames, run the scraper.
+
+![/server-populating](assets/server-populating.png?raw=true "Server Population")
