@@ -132,9 +132,11 @@ function serverTemplate() {
       </div>
       <div class="column is-one-third">
         <h2 class="title is-5">Collections in Database ({{ availableCollections.length }})</h2>
-        <p class="subtitle is-6"><button class="button is-success is-small" @click="addAllToQueue()" :disabled="availableCollections.length === 0">
-          <a class="delete plus is-small"></a>&nbsp; Add All
-        </button></p>
+        <p class="subtitle is-6">
+          <button class="button is-info is-small" @click="addAllToQueue()" :disabled="availableCollections.length === 0">
+            <a class="delete plus is-small"></a>&nbsp; Add All
+          </button>
+        </p>
         <div class="overflow-panel">
           <nav class="panel">
             <label class="panel-block" v-if="availableCollections.length === 0">
@@ -151,7 +153,7 @@ function serverTemplate() {
       <div class="column is-one-third">
         <h2 class="title is-5">Paste usernames, new line separated</h2>
         <p class="subtitle is-6">
-          <button class="button is-success is-small" @click="addDumpToQueue()" :disabled="dump.length === 0">
+          <button class="button is-info is-small" @click="addDumpToQueue()" :disabled="dump.length === 0">
             <a class="delete plus is-small"></a>&nbsp; Add
           </button>
         </p>
