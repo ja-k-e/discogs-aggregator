@@ -50,6 +50,15 @@ function releaseTemplate() {
         </a>
       </p>
 
+      <br>
+      <h2 class="title is-5">Images</h2>
+      <div class="images">
+        <div>
+          <img :src="image.resource_url" :height="image.height" :width="image.width" v-for="image in full.images">
+        </div>
+      </div>
+
+      <br>
       <div v-if="release.formats">
         <h2 class="title is-5">Release Formats</h2>
         <table class="table is-narrow is-fullwidth is-striped">
@@ -73,20 +82,21 @@ function releaseTemplate() {
       </div>
 
       <br>
-      <h2 class="title is-5">Images</h2>
-      <div class="images">
-        <div>
-          <img :src="image.resource_url" :height="image.height" :width="image.width" v-for="image in full.images">
-        </div>
-      </div>
-
-      <br>
       <h2 class="title is-5">Tracks</h2>
-      <ul>
-        <li v-for="track in full.tracklist">
-          <span class="tag is-rounded" v-if="track.position">{{ track.position }}</span> {{ track.title }}
-        </li>
-      </ul>
+      <table class="table is-narrow is-fullwidth is-striped">
+        <thead>
+          <tr>
+            <th><small>Pos.</small></th>
+            <th><small>Title</small></th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr v-for="track in full.tracklist">
+          <td>{{ track.position }}</td>
+          <td>{{ track.title }}</td>
+        </tr>
+        </tbody>
+      </table>
       <br>
       <h2 class="title is-5">Notes</h2>
 
