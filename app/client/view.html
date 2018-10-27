@@ -109,93 +109,90 @@
     }
 
     .ansi-30 {
-      /* black */
       color: var(--terminal-black)
     }
 
     .ansi-37 {
-      /* white */
       color: var(--terminal-white)
     }
 
     .ansi-31 {
-      /* red */
       color: var(--terminal-red)
     }
 
     .ansi-32 {
-      /* green */
       color: var(--terminal-green)
     }
 
     .ansi-34 {
-      /* blue */
       color: var(--terminal-blue)
     }
 
     .ansi-33 {
-      /* yellow */
       color: var(--terminal-yellow)
     }
 
     .ansi-35 {
-      /* purple */
       color: var(--terminal-purple)
     }
 
     .ansi-36 {
-      /* cyan */
       color: var(--terminal-cyan)
     }
 
     .ansi-40 {
-      /* bgBlack */
       background-color: var(--terminal-black)
     }
 
     .ansi-47 {
-      /* bgWhite */
       background-color: var(--terminal-white)
     }
 
     .ansi-41 {
-      /* bgRed */
       background-color: var(--terminal-red)
     }
 
     .ansi-42 {
-      /* bgGreen */
       background-color: var(--terminal-green)
     }
 
     .ansi-44 {
-      /* bgBlue */
       background-color: var(--terminal-blue)
     }
 
     .ansi-43 {
-      /* bgYellow */
       background-color: var(--terminal-yellow)
     }
 
     .ansi-45 {
-      /* bgPurple */
       background-color: var(--terminal-purple)
     }
 
     .ansi-46 {
-      /* bgCyan */
       background-color: var(--terminal-cyan)
     }
 
     .ansi-1 {
-      /* bold */
       font-weight: bold;
     }
 
     .ansi-4 {
-      /* underline */
       text-decoration: underline;
+    }
+
+    .images {
+      overflow-x: scroll;
+      white-space: nowrap;
+    }
+
+    .images img+img {
+      margin-left: 1rem;
+    }
+
+    .images img {
+      width: auto;
+      height: 200px;
+      display: inline-block;
     }
   </style>
 </head>
@@ -223,8 +220,8 @@
         <div v-if="payload"></div>
         <browser v-if="currentView == 'browser'" :collections="payload.collections" :artists="payload.artists" :releases="payload.releases"
           :labels="payload.labels" :index="payload.index"></browser>
-        <release v-else-if="currentView == 'release'" :release="payload.release" :releases="payload.releases"></release>
-        <artist v-else-if="currentView == 'artist'" :artist="payload.artist" :artists="payload.artists"></artist>
+        <release v-else-if="currentView == 'release'" :release="payload.release" :releases="payload.releases" :full="payload.full"></release>
+        <artist v-else-if="currentView == 'artist'" :artist="payload.artist" :artists="payload.artists" :full="payload.full"></artist>
         <server v-else-if="currentView == 'server'" :collections="payload.collections"></server>
       </div>
     </section>

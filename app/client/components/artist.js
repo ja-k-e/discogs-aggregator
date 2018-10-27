@@ -1,11 +1,12 @@
 Vue.component("artist", {
   props: {
     artist: Object,
-    artists: Array
+    artists: Array,
+    full: Object
   },
   data() {
     return {
-      activeTab: "releases"
+      activeTab: "info"
     };
   },
   computed: {
@@ -60,6 +61,9 @@ function artistTemplate() {
 
     <div class="tabs">
       <ul>
+        <li :class="{ 'is-active': activeTab == 'info' }">
+          <a @click="activeTab = 'info'">Information</a>
+        </li>
         <li :class="{ 'is-active': activeTab == 'releases' }">
           <a @click="activeTab = 'releases'">Releases ({{ artist.release_count }})</a>
         </li>
@@ -67,6 +71,19 @@ function artistTemplate() {
           <a @click="activeTab = 'common'">Similar Artists ({{ artists.length }})</a>
         </li>
       </ul>
+    </div>
+
+    <div v-if="activeTab == 'info'">
+      <h2 class="title is-5">Images</h2>
+      <div class="images">
+        <div>
+          <img :src="image.resource_url" :height="image.height" :width="image.width" v-for="image in full.images">
+        </div>
+      </div>
+
+      <br>
+      <h2 class="title is-5">Profile</h2>
+      <div class="content" v-html="'<p>' + full.profile.replace(/\\n/g, '</p><p>') + '</p>'"></div>
     </div>
 
     <div v-if="activeTab == 'releases'">

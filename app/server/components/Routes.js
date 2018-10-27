@@ -3,8 +3,10 @@ const Aggregator = require("./Aggregator");
 const Database = require("./Database");
 const db = new Database();
 const sse = require("./sse");
-
+const Discogs = require("disconnect").Client;
 const fs = require("fs");
+const settings = JSON.parse(fs.readFileSync("secrets.json").toString());
+
 const {
   getAllData,
   getArtist,
@@ -25,6 +27,7 @@ class Routes {
   constructor(app) {
     this.app = app;
     this.app.use(sse);
+    this.api = new Discogs(settings.discogs).database();
     this.initialize();
   }
 
@@ -78,7 +81,10 @@ class Routes {
       data.payload = { artist: artist.rows[0] };
       const graph = await db.execute(getArtistGraph(req.params.artistId));
       data.payload.artists = graph.rows;
-      res.send(this.injectData(data));
+      this.api.getArtist(req.params.artistId).then(full => {
+        data.payload.full = full;
+        res.send(this.injectData(data));
+      });
     };
     this.app.get("/artist/:artistId", am(callback));
   }
@@ -90,7 +96,10 @@ class Routes {
       data.payload = { release: release.rows[0] };
       const graph = await db.execute(getReleaseGraph(req.params.releaseId));
       data.payload.releases = graph.rows;
-      res.send(this.injectData(data));
+      this.api.getRelease(req.params.releaseId).then(full => {
+        data.payload.full = full;
+        res.send(this.injectData(data));
+      });
     };
     this.app.get("/release/:releaseId", am(callback));
   }

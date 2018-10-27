@@ -4,7 +4,7 @@ const Discogs = require("disconnect").Client;
 const fs = require("fs");
 const settings = JSON.parse(fs.readFileSync("secrets.json").toString());
 const PER_PAGE = 100;
-const PAGE_LIMIT = 10;
+const PAGE_LIMIT = 20;
 
 class Collection {
   constructor(username, messenger) {
