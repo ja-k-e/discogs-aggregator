@@ -25,4 +25,4 @@ HAVING count(DISTINCT collection_id) >= (
   ) tmp
 )
  ORDER BY count(DISTINCT collection_id) DESC, max(a.name)
- LIMIT 500;
+ LIMIT 100;

@@ -1,4 +1,4 @@
-Vue.component("server", {
+Vue.component("server-page", {
   props: {
     collections: Array
   },
@@ -31,11 +31,6 @@ Vue.component("server", {
     };
   },
   methods: {
-    addAllToQueue() {
-      this.availableCollections.forEach(({ id }) => {
-        this.addToQueue(id);
-      });
-    },
     addDumpToQueue() {
       this.dump.forEach(id => this.addToQueue(id));
     },
@@ -115,7 +110,7 @@ function serverTemplate() {
     </div>
 
     <div class="columns">
-      <div class="column is-one-third">
+      <div class="column is-one-half">
         <h2 class="title is-5">Queued for Fetching ({{ availableQueue.length }})</h2>
         <div class="overflow-panel">
           <nav class="panel">
@@ -138,26 +133,7 @@ function serverTemplate() {
           Import {{ availableQueue.length }} Discogs Collection(s)
         </button>
       </div>
-      <div class="column is-one-third">
-        <h2 class="title is-5">Collections in Database ({{ availableCollections.length }})</h2>
-        <div class="overflow-panel">
-          <nav class="panel">
-            <label class="panel-block" v-if="availableCollections.length === 0">
-              <em>None</em>
-            </label>
-            <a class="panel-block" v-for="{ id } in availableCollections"
-              @click="addToQueue(id)"
-            ><span class="panel-icon"><a class="delete plus is-small"></a></span>
-              {{ id }}
-            </a>
-          </nav>
-        </div>
-        <br>
-        <button class="button is-info is-fullwidth" @click="addAllToQueue()" :disabled="availableCollections.length === 0">
-          <a class="delete plus is-small"></a>&nbsp; Add All
-        </button>
-      </div>
-      <div class="column is-one-third">
+      <div class="column is-one-half">
         <h2 class="title is-5">Usernames, new line separated  ({{ dump.length }})</h2>
         <textarea class="textarea" rows="11" v-model="dumpRaw"></textarea>
         <br>

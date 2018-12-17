@@ -8,12 +8,14 @@ const fs = require("fs");
 const settings = JSON.parse(fs.readFileSync("secrets.json").toString());
 
 const {
-  getAllData,
+  fuzzySearch,
   getArtist,
   getArtistGraph,
   getArtistReleases,
+  getCollection,
   getCollectionReleases,
   getCollections,
+  getLabel,
   getLabelReleases,
   getRelease,
   getReleaseGraph
@@ -40,6 +42,8 @@ class Routes {
     await this.initializeViewRoot();
     await this.initializeViewServer();
     await this.initializeViewArtist();
+    await this.initializeViewCollection();
+    await this.initializeViewLabel();
     await this.initializeViewRelease();
   }
 
@@ -48,16 +52,12 @@ class Routes {
     await this.initializeApiCollectionReleases();
     await this.initializeApiLabelReleases();
     await this.initializeApiPopulate();
+    await this.initializeApiSearch();
   }
 
   async initializeViewRoot() {
     const callback = async (req, res) => {
-      const data = { type: "browser" };
-      const allData = await db.execute(getAllData());
-      data.payload = allData.rows[0];
-      const releaseQ = getCollectionReleases(data.payload.collections[0].id);
-      const releases = await db.execute(releaseQ);
-      data.payload.releases = releases.rows;
+      const data = { type: "browser", payload: {} };
       res.send(this.injectData(data));
     };
     this.app.get("/", am(callback));
@@ -104,6 +104,34 @@ class Routes {
     this.app.get("/release/:releaseId", am(callback));
   }
 
+  async initializeViewCollection() {
+    const callback = async (req, res) => {
+      const data = { type: "collection", payload: {} };
+      const collection = await db.execute(
+        getCollection(req.params.collectionId)
+      );
+      data.payload.collection = collection.rows[0];
+      const graph = await db.execute(
+        getCollectionReleases(req.params.collectionId)
+      );
+      data.payload.releases = graph.rows;
+      res.send(this.injectData(data));
+    };
+    this.app.get("/collection/:collectionId", am(callback));
+  }
+
+  async initializeViewLabel() {
+    const callback = async (req, res) => {
+      const data = { type: "label", payload: {} };
+      const label = await db.execute(getLabel(req.params.labelId));
+      data.payload.label = label.rows[0];
+      const graph = await db.execute(getLabelReleases(req.params.labelId));
+      data.payload.releases = graph.rows;
+      res.send(this.injectData(data));
+    };
+    this.app.get("/label/:labelId", am(callback));
+  }
+
   async initializeApiArtistReleases() {
     const callback = async (req, res) => {
       const releases = await db.execute(getArtistReleases(req.query.artistId));
@@ -139,7 +167,6 @@ class Routes {
         .map(i => decodeURIComponent(i));
       res.sseSetup();
       const aggregator = new Aggregator(usernames, d => {
-        console.log(d);
         res.sseSend({ type: "message", payload: d });
       });
       aggregator
@@ -150,6 +177,16 @@ class Routes {
         })
         .catch(e => res.sseSend({ type: "error", payload: e.message }));
     });
+  }
+
+  async initializeApiSearch() {
+    const callback = async (req, res) => {
+      const term = decodeURIComponent(req.query.term).toLowerCase();
+      const type = decodeURIComponent(req.query.type).toLowerCase();
+      const { rows } = await db.execute(fuzzySearch(term, type));
+      res.send(rows);
+    };
+    this.app.get("/api/search", am(callback));
   }
 
   injectData(data) {

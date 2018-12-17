@@ -1,4 +1,4 @@
-Vue.component("release", {
+Vue.component("release-page", {
   props: {
     release: Object,
     releases: Array,
@@ -15,7 +15,7 @@ Vue.component("release", {
   },
   data() {
     return {
-      activeTab: "info"
+      activeTab: "common"
     };
   },
   template: releaseTemplate()
@@ -33,11 +33,11 @@ function releaseTemplate() {
 
     <div class="tabs">
       <ul>
-        <li :class="{ 'is-active': activeTab == 'info' }">
-          <a @click="activeTab = 'info'">Information</a>
-        </li>
         <li :class="{ 'is-active': activeTab == 'common' }">
           <a @click="activeTab = 'common'">Similar Releases ({{ releases.length }})</a>
+        </li>
+        <li :class="{ 'is-active': activeTab == 'info' }">
+          <a @click="activeTab = 'info'">Information</a>
         </li>
       </ul>
     </div>
@@ -100,25 +100,11 @@ function releaseTemplate() {
       <br>
       <h2 class="title is-5">Notes</h2>
 
-      <div class="content" v-html="'<p>' + full.notes.replace(/\\n/g, '</p><p>') + '</p>'"></div>
+      <div class="content" v-html="'<p>' + (full.notes || '').replace(/\\n/g, '</p><p>') + '</p>'"></div>
     </div>
 
     <div v-if="activeTab == 'common'">
-      <table class="table is-narrow is-fullwidth is-striped">
-        <thead>
-          <th><small>Shared Collections</small></th>
-          <th><small>Release</small></th>
-          <th><small>Artists</small></th>
-          <th><small>Labels</small></th>
-        </thead>
-        <tbody>
-          <release-release v-for="r in releases"
-            :key="r.id"
-            :release="r"
-            :collection_count="release.collection_count"
-          ></release-release>
-        </tbody>
-      </table>
+      <releases-component :releases="releases" :collection_count="release.collection_count"></releases-component>
     </div>
   </div>
   `;

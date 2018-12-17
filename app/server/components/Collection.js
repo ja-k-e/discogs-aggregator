@@ -61,6 +61,12 @@ class Collection {
                 `❗ Rate Limited. Pushing Back ${this.pushback}s.`.red
               );
               setTimeout(() => resolve(this.run()), this.pushback * 1000);
+            } else if (
+              message ===
+              "You are not allowed to view this resource. Please authenticate as the owner to view this content."
+            ) {
+              this.messenger(`Private Collection!`.red);
+              resolve(this.data);
             } else reject({ statusCode, message });
           });
       } else resolve(this._run());
@@ -97,6 +103,12 @@ class Collection {
               () => resolve(this._run(collection, page)),
               this.pushback * 1000
             );
+          } else if (
+            message ===
+            "You are not allowed to view this resource. Please authenticate as the owner to view this content."
+          ) {
+            this.messenger(`Private Collection!`.red);
+            resolve(this.data);
           } else reject({ statusCode, message });
         });
     });

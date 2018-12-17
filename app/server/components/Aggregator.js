@@ -15,6 +15,9 @@ class Aggregator {
     return new Promise((resolve, reject) => {
       this.processUser()
         .then(() => {
+          this.messenger(
+            `Refreshing Views. This might take awhile.`.green.bold
+          );
           this.database
             .refreshMaterializedViews()
             .then(() => resolve())

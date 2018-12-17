@@ -1,244 +1,268 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Discogs Aggregator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"
+    />
+    <style>
+      .overflow-panel {
+        height: 286px;
+        overflow-y: auto;
+        box-shadow: 0px 2px 8px #f0f0f0;
+        border: 1px solid #dbdbdb;
+        -webkit-user-select: none;
+        user-select: none;
+        border-radius: 4px;
+      }
 
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Discogs Aggregator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" type="text/css" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"
-  />
-  <style>
-    .overflow-panel {
-      height: 286px;
-      overflow-y: auto;
-      box-shadow: 0px 2px 8px #f0f0f0;
-      border: 1px solid #dbdbdb;
-      -webkit-user-select: none;
-      user-select: none;
-      border-radius: 4px;
-    }
+      .overflow-panel .panel-block:last-child {
+        border-bottom: none;
+      }
 
-    .overflow-panel .panel-block:last-child {
-      border-bottom: none;
-    }
+      .overflow-panel .panel-block:first-child {
+        border-top: none;
+      }
 
-    .overflow-panel .panel-block:first-child {
-      border-top: none;
-    }
+      .overflow-panel .panel-block {
+        border-left: none;
+        border-right: none;
+      }
 
-    .overflow-panel .panel-block {
-      border-left: none;
-      border-right: none;
-    }
+      div.search-component {
+        position: relative;
+      }
 
-    div.search-component {
-      position: relative;
-    }
+      div.search-component .results {
+        position: absolute;
+        top: calc(100% + 4px);
+        z-index: 9;
+        background: white;
+        border: 1px solid #ddd;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        border-radius: 4px;
+      }
 
-    div.search-component .results {
-      position: absolute;
-      top: calc(100% + 4px);
-      z-index: 9;
-      background: white;
-      border: 1px solid #ddd;
-      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      border-radius: 4px;
-    }
+      div.search-component .results:empty {
+        box-shadow: none;
+        border: none;
+      }
 
-    div.search-component .results:empty {
-      box-shadow: none;
-      border: none;
-    }
+      div.search-component .results > a {
+        box-sizing: border-box;
+        padding: 0.5rem 1rem;
+        display: flex;
+        font-size: 0.9rem;
+        width: 100%;
+        font-weight: bold;
+      }
 
-    div.search-component .results>a {
-      box-sizing: border-box;
-      padding: 0.5rem 1rem;
-      display: flex;
-      font-size: 0.9rem;
-      width: 100%;
-      font-weight: bold;
-    }
+      div.search-component .results > a span {
+        margin-left: auto;
+      }
 
-    div.search-component .results>a span {
-      margin-left: auto;
-    }
+      div.search-component .results > a + a {
+        border-top: 1px solid #ddd;
+      }
 
-    div.search-component .results>a+a {
-      border-top: 1px solid #ddd;
-    }
+      .delete.plus::after {
+        -webkit-transform: translateX(-50%) translateY(-50%) rotate(0deg);
+        transform: translateX(-50%) translateY(-50%) rotate(0deg);
+      }
 
-    .delete.plus::after {
-      -webkit-transform: translateX(-50%) translateY(-50%) rotate(0deg);
-      transform: translateX(-50%) translateY(-50%) rotate(0deg);
-    }
+      .delete.plus::before {
+        -webkit-transform: translateX(-50%) translateY(-50%) rotate(0deg);
+        transform: translateX(-50%) translateY(-50%) rotate(0deg);
+      }
 
-    .delete.plus::before {
-      -webkit-transform: translateX(-50%) translateY(-50%) rotate(0deg);
-      transform: translateX(-50%) translateY(-50%) rotate(0deg);
-    }
+      :root {
+        --terminal-bg: rgb(42, 42, 42);
+        --terminal-fg: rgb(229, 229, 229);
+        --terminal-black: rgb(102, 102, 102);
+        --terminal-white: rgb(229, 229, 229);
+        --terminal-red: rgb(255, 59, 72);
+        --terminal-green: rgb(0, 213, 137);
+        --terminal-blue: rgb(8, 142, 237);
+        --terminal-yellow: rgb(245, 246, 44);
+        --terminal-purple: rgb(227, 104, 216);
+        --terminal-cyan: rgb(0, 186, 221);
+      }
 
-    :root {
-      --terminal-bg: rgb(42, 42, 42);
-      --terminal-fg: rgb(229, 229, 229);
-      --terminal-black: rgb(102, 102, 102);
-      --terminal-white: rgb(229, 229, 229);
-      --terminal-red: rgb(255, 59, 72);
-      --terminal-green: rgb(0, 213, 137);
-      --terminal-blue: rgb(8, 142, 237);
-      --terminal-yellow: rgb(245, 246, 44);
-      --terminal-purple: rgb(227, 104, 216);
-      --terminal-cyan: rgb(0, 186, 221);
-    }
+      #console-messages {
+        height: 50vh;
+        overflow-y: auto;
+        border-radius: 4px;
+        background-color: var(--terminal-bg);
+        color: var(--terminal-fg);
+        box-sizing: border-box;
+        padding: 0.5rem;
+      }
 
-    #console-messages {
-      height: 50vh;
-      overflow-y: auto;
-      border-radius: 4px;
-      background-color: var(--terminal-bg);
-      color: var(--terminal-fg);
-      box-sizing: border-box;
-      padding: 0.5rem;
-    }
+      .console-message {
+        display: block;
+        font-family: "Operator Mono Ssm", monospace;
+        font-size: 13px;
+      }
 
-    .console-message {
-      display: block;
-      font-family: 'Operator Mono Ssm', monospace;
-      font-size: 13px;
-    }
+      .ansi-30 {
+        color: var(--terminal-black);
+      }
 
-    .ansi-30 {
-      color: var(--terminal-black)
-    }
+      .ansi-37 {
+        color: var(--terminal-white);
+      }
 
-    .ansi-37 {
-      color: var(--terminal-white)
-    }
+      .ansi-31 {
+        color: var(--terminal-red);
+      }
 
-    .ansi-31 {
-      color: var(--terminal-red)
-    }
+      .ansi-32 {
+        color: var(--terminal-green);
+      }
 
-    .ansi-32 {
-      color: var(--terminal-green)
-    }
+      .ansi-34 {
+        color: var(--terminal-blue);
+      }
 
-    .ansi-34 {
-      color: var(--terminal-blue)
-    }
+      .ansi-33 {
+        color: var(--terminal-yellow);
+      }
 
-    .ansi-33 {
-      color: var(--terminal-yellow)
-    }
+      .ansi-35 {
+        color: var(--terminal-purple);
+      }
 
-    .ansi-35 {
-      color: var(--terminal-purple)
-    }
+      .ansi-36 {
+        color: var(--terminal-cyan);
+      }
 
-    .ansi-36 {
-      color: var(--terminal-cyan)
-    }
+      .ansi-40 {
+        background-color: var(--terminal-black);
+      }
 
-    .ansi-40 {
-      background-color: var(--terminal-black)
-    }
+      .ansi-47 {
+        background-color: var(--terminal-white);
+      }
 
-    .ansi-47 {
-      background-color: var(--terminal-white)
-    }
+      .ansi-41 {
+        background-color: var(--terminal-red);
+      }
 
-    .ansi-41 {
-      background-color: var(--terminal-red)
-    }
+      .ansi-42 {
+        background-color: var(--terminal-green);
+      }
 
-    .ansi-42 {
-      background-color: var(--terminal-green)
-    }
+      .ansi-44 {
+        background-color: var(--terminal-blue);
+      }
 
-    .ansi-44 {
-      background-color: var(--terminal-blue)
-    }
+      .ansi-43 {
+        background-color: var(--terminal-yellow);
+      }
 
-    .ansi-43 {
-      background-color: var(--terminal-yellow)
-    }
+      .ansi-45 {
+        background-color: var(--terminal-purple);
+      }
 
-    .ansi-45 {
-      background-color: var(--terminal-purple)
-    }
+      .ansi-46 {
+        background-color: var(--terminal-cyan);
+      }
 
-    .ansi-46 {
-      background-color: var(--terminal-cyan)
-    }
+      .ansi-1 {
+        font-weight: bold;
+      }
 
-    .ansi-1 {
-      font-weight: bold;
-    }
+      .ansi-4 {
+        text-decoration: underline;
+      }
 
-    .ansi-4 {
-      text-decoration: underline;
-    }
+      .images {
+        overflow-x: scroll;
+        white-space: nowrap;
+      }
 
-    .images {
-      overflow-x: scroll;
-      white-space: nowrap;
-    }
+      .images img + img {
+        margin-left: 1rem;
+      }
 
-    .images img+img {
-      margin-left: 1rem;
-    }
+      .images img {
+        width: auto;
+        height: 200px;
+        display: inline-block;
+      }
+    </style>
+  </head>
 
-    .images img {
-      width: auto;
-      height: 200px;
-      display: inline-block;
-    }
-  </style>
-</head>
-
-<body>
-  <nav class="navbar is-info" role="navigation" aria-label="main navigation">
-    <div class="container">
-      <div class="navbar-brand">
-        <a class="navbar-item" href="/">
-          <strong>Discogs Aggregator</strong>
-        </a>
-      </div>
-      <div class="navbar-menu">
-        <div class="navbar-end">
-          <a class="navbar-item" href="/server">
-            Server
+  <body>
+    <nav class="navbar is-info" role="navigation" aria-label="main navigation">
+      <div class="container">
+        <div class="navbar-brand">
+          <a class="navbar-item" href="/">
+            <strong>Discogs Aggregator</strong>
           </a>
         </div>
+        <div class="navbar-menu">
+          <div class="navbar-end">
+            <a class="navbar-item" href="/server"> Server </a>
+          </div>
+        </div>
       </div>
+    </nav>
+    <div class="container">
+      <section class="section">
+        <div id="app">
+          <div v-if="payload"></div>
+          <browser-page v-if="currentView == 'browser'"></browser-page>
+          <artist-page
+            v-else-if="currentView == 'artist'"
+            :artist="payload.artist"
+            :artists="payload.artists"
+            :full="payload.full"
+          ></artist-page>
+          <collection-page
+            v-else-if="currentView == 'collection'"
+            :collection="payload.collection"
+            :releases="payload.releases"
+          ></collection-page>
+          <label-page
+            v-else-if="currentView == 'label'"
+            :label="payload.label"
+            :releases="payload.releases"
+          ></label-page>
+          <release-page
+            v-else-if="currentView == 'release'"
+            :release="payload.release"
+            :releases="payload.releases"
+            :full="payload.full"
+          ></release-page>
+          <server-page
+            v-else-if="currentView == 'server'"
+            :collections="payload.collections"
+          ></server-page>
+        </div>
+      </section>
     </div>
-  </nav>
-  <div class="container">
-    <section class="section">
-      <div id="app">
-        <div v-if="payload"></div>
-        <browser v-if="currentView == 'browser'" :collections="payload.collections" :artists="payload.artists" :releases="payload.releases"
-          :labels="payload.labels" :index="payload.index"></browser>
-        <release v-else-if="currentView == 'release'" :release="payload.release" :releases="payload.releases" :full="payload.full"></release>
-        <artist v-else-if="currentView == 'artist'" :artist="payload.artist" :artists="payload.artists" :full="payload.full"></artist>
-        <server v-else-if="currentView == 'server'" :collections="payload.collections"></server>
-      </div>
-    </section>
-  </div>
 
-  <input type="hidden" id="payload" value="" />
+    <input type="hidden" id="payload" value="" />
 
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
 
-  <script src="/components/artist.js"></script>
-  <script src="/components/browser.js"></script>
-  <script src="/components/release-release.js"></script>
-  <script src="/components/release.js"></script>
-  <script src="/components/server.js"></script>
-  <script src="/app.js"></script>
-</body>
-
+    <script src="/components/release-component.js"></script>
+    <script src="/components/releases-component.js"></script>
+    <script src="/pages/artist-page.js"></script>
+    <script src="/pages/browser-page.js"></script>
+    <script src="/pages/collection-page.js"></script>
+    <script src="/pages/label-page.js"></script>
+    <script src="/pages/release-page.js"></script>
+    <script src="/pages/server-page.js"></script>
+    <script src="/app.js"></script>
+  </body>
 </html>

@@ -73,3 +73,5 @@ SELECT
     ar.artist_id
   FROM collection_releases cr
   LEFT JOIN artist_releases ar ON ar.release_id = cr.release_id;
+
+CREATE EXTENSION fuzzystrmatch;
